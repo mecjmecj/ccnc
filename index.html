@@ -7,50 +7,63 @@
     <style>
         /* --- CORE STYLES --- */
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 950px; margin: 0 auto; }
+        .container { max-width: 950px; margin: 0 auto; display: none; }
+        .container.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        /* --- SETUP MODAL --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; display: flex; justify-content: center; align-items: center; }
-        .modal-content { background: #1e293b; padding: 30px; border-radius: 15px; border: 2px solid #38bdf8; text-align: center; width: 90%; max-width: 450px; box-shadow: 0 0 30px rgba(56, 189, 248, 0.4); }
-        .modal-content h2 { color: #38bdf8; margin-top: 0; }
-        .name-input { padding: 12px; width: 80%; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; margin-bottom: 20px; font-size: 18px; text-align: center; }
-        .name-input:focus { outline: none; border-color: #38bdf8; }
-        .avatar-grid { display: flex; gap: 10px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
-        .avatar-option { font-size: 35px; padding: 10px; background: #334155; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
-        .avatar-option:hover { transform: scale(1.1); }
-        .avatar-option.selected { border-color: #38bdf8; background: #0f172a; box-shadow: 0 0 15px rgba(56,189,248,0.5); }
-        .start-btn { background: #10b981; color: white; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; transition: 0.2s; }
+        /* --- MODALS --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 15px; border: 2px solid #38bdf8; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(56, 189, 248, 0.4); }
+        .modal-content h2 { color: #38bdf8; margin-top: 0; font-size: 28px; }
+        .auth-tabs { display: flex; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
+        .auth-tab { flex: 1; padding: 10px; background: #0f172a; color: #94a3b8; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .auth-tab.active { background: #38bdf8; color: #0f172a; }
+        .input-field { padding: 12px; width: 85%; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; margin-bottom: 15px; font-size: 16px; text-align: center; }
+        .input-field:focus { outline: none; border-color: #38bdf8; }
+        .avatar-grid { display: flex; gap: 8px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .avatar-option { font-size: 30px; padding: 8px; background: #334155; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
+        .avatar-option.selected { border-color: #38bdf8; background: #0f172a; box-shadow: 0 0 10px rgba(56,189,248,0.5); }
+        .start-btn { background: #10b981; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 95%; text-transform: uppercase; transition: 0.2s; margin-bottom: 10px; }
         .start-btn:hover { background: #059669; transform: scale(1.02); }
+        .level-btn { background: #3b82f6; } .level-btn:hover { background: #2563eb; }
+        .level-2-btn { background: #f59e0b; } .level-2-btn:hover { background: #d97706; }
+        .error-msg { color: #ef4444; font-size: 14px; margin-bottom: 10px; height: 16px; font-weight: bold; }
 
         /* --- DASHBOARD HUB --- */
         .dashboard-header { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #38bdf8; border-radius: 15px; padding: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         .profile { display: flex; align-items: center; gap: 15px; }
         .avatar { font-size: 40px; background: #334155; border-radius: 50%; padding: 10px; border: 2px solid #38bdf8; }
-        .stats-grid { display: flex; gap: 15px; }
-        .stat-box { background: #1e293b; border-radius: 10px; padding: 10px 15px; text-align: center; border: 1px solid #475569; }
+        .stats-grid { display: flex; gap: 15px; align-items: center; }
+        .stat-box { background: #1e293b; border-radius: 10px; padding: 10px 15px; text-align: center; border: 1px solid #475569; min-width: 80px; }
         .stat-value { font-size: 22px; font-weight: bold; color: #38bdf8; }
         .stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
+        .logout-btn { background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .logout-btn:hover { background: #b91c1c; }
         .on-fire { color: #f97316 !important; text-shadow: 0 0 10px #f97316; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
         /* --- TABS --- */
-        .arcade-menu { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .tab-btn { flex: 1; padding: 12px; background: #1e293b; border: 2px solid #334155; color: white; font-size: 14px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; min-width: 100px; text-align: center; }
+        .arcade-menu { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        .tab-btn { flex: 1; padding: 10px; background: #1e293b; border: 2px solid #334155; color: white; font-size: 13px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.3s; min-width: 90px; text-align: center; margin-top: 5px; }
         .tab-btn:hover { background: #334155; }
         .tab-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.4); }
+        .menu-group { display: flex; gap: 8px; border: 2px dashed #6366f1; border-radius: 12px; padding: 15px 8px 8px 8px; position: relative; flex-wrap: wrap; justify-content: center; margin: 0 5px; }
+        .menu-group-label { position: absolute; top: -10px; left: 15px; background: #0f172a; padding: 0 8px; font-size: 11px; font-weight: bold; color: #818cf8; text-transform: uppercase; }
 
         /* --- CONTENT BOARDS --- */
         .content-board { background: #1e293b; border-radius: 15px; padding: 30px; display: none; }
-        .content-board.active { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .content-board.active { display: block; animation: boardFade 0.4s; }
+        @keyframes boardFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Flashcards */
-        .scene { width: 100%; height: 220px; perspective: 600px; margin: 20px 0; }
-        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        /* 📚 FLASHCARDS STYLES */
+        .scene { width: 100%; height: 250px; perspective: 600px; margin: 20px 0; }
+        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
         .flashcard.is-flipped { transform: rotateY(180deg); }
-        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; font-size: 28px; font-weight: bold; text-align: center; padding: 20px; box-sizing: border-box; }
-        .flashcard-front { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); }
-        .flashcard-back { background: linear-gradient(135deg, #10b981, #059669); color: white; transform: rotateY(180deg); font-size: 20px; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; text-align: center; padding: 20px; box-sizing: border-box; }
+        .flashcard-front { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); font-size: 36px; font-weight: bold; }
+        .flashcard-back { background: linear-gradient(135deg, #10b981, #059669); color: white; transform: rotateY(180deg); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+        .fc-mean { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .fc-sent { font-size: 16px; font-style: italic; color: #d1fae5; }
         .controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
         .btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .btn:hover { background: #0ea5e9; color: white; }
@@ -65,94 +78,142 @@
         .vibe-btn-neu { background: #334155; border: 2px solid #94a3b8; }
         .vibe-btn-neg { background: #7f1d1d; border: 2px solid #ef4444; }
         
-        /* Sentence Builder (Game 5) Specifics */
+        /* Sentence Builder */
         .scramble-btn { background: #475569; color: white; border: 2px solid #64748b; padding: 12px 20px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .scramble-btn:hover { background: #64748b; border-color: #f59e0b; transform: translateY(-2px); }
         .answer-slot { background: #0f172a; border: 2px dashed #f59e0b; min-height: 60px; border-radius: 10px; padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 20px; }
 
-        /* Game Feedbacks */
+        /* Mistakes */
+        .mistake-card { background: #334155; padding: 15px; border-radius: 8px; border-left: 5px solid #ef4444; text-align: left; margin-bottom: 10px; }
+        .mistake-word { font-size: 20px; font-weight: bold; color: #38bdf8; margin-bottom: 5px; text-transform: uppercase; }
+        .mistake-mean { color: white; margin-bottom: 5px; }
+        .mistake-sent { color: #94a3b8; font-style: italic; font-size: 14px; }
+        
+        /* Feedbacks */
         .correct-btn, .correct-slot { background: #10b981 !important; color: white !important; border-color: #059669 !important; }
         .wrong-btn, .wrong-slot { background: #ef4444 !important; color: white !important; border-color: #b91c1c !important; opacity: 0.8; }
         .shake { animation: shake 0.4s; }
         @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
 
-        /* --- LEADERBOARD --- */
+        /* LEADERBOARD */
         .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .leaderboard-table th, .leaderboard-table td { padding: 15px; text-align: left; border-bottom: 1px solid #334155; font-size: 18px; }
         .leaderboard-table th { color: #38bdf8; font-size: 14px; text-transform: uppercase; }
         .is-player { background: rgba(56, 189, 248, 0.15); font-weight: bold; border-left: 4px solid #38bdf8; color: #38bdf8; }
-        .rank-1 { color: gold; } .rank-2 { color: silver; } .rank-3 { color: #cd7f32; }
+        .rank-1 { color: gold; font-weight: bold; } .rank-2 { color: silver; font-weight: bold; } .rank-3 { color: #cd7f32; font-weight: bold; }
+        
+        .time-btn { background: #334155; color: white; border: none; padding: 10px 20px; margin: 0 5px; border-radius: 5px; cursor: pointer; }
+        .time-btn:hover { background: #475569; }
+        .time-btn.active { background: #e94560; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- PROFILE SETUP MODAL -->
-    <div class="modal-overlay" id="setup-modal">
+    <!-- AUTHENTICATION MODAL -->
+    <div class="modal-overlay" id="auth-modal">
         <div class="modal-content">
-            <h2>📝 Create Your Persona</h2>
-            <p>Enter your name and choose an avatar to join the leaderboard.</p>
-            <input type="text" id="player-name-input" class="name-input" placeholder="Enter Nickname..." maxlength="12">
-            <div class="avatar-grid" id="avatar-selection">
-                <div class="avatar-option selected" onclick="selectAvatar(this, '🐉')">🐉</div>
-                <div class="avatar-option" onclick="selectAvatar(this, '🥷')">🥷</div>
-                <div class="avatar-option" onclick="selectAvatar(this, '🧙‍♂️')">🧙‍♂️</div>
-                <div class="avatar-option" onclick="selectAvatar(this, '🤖')">🤖</div>
-                <div class="avatar-option" onclick="selectAvatar(this, '👽')">👽</div>
-                <div class="avatar-option" onclick="selectAvatar(this, '🦄')">🦄</div>
+            <h2>🕹️ DSE Arcade Login</h2>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchAuthMode('login')">LOGIN</div>
+                <div class="auth-tab" id="tab-register" onclick="switchAuthMode('register')">REGISTER</div>
             </div>
-            <button class="start-btn" onclick="saveProfile()">Start Training 🚀</button>
+
+            <div class="error-msg" id="auth-error"></div>
+
+            <div id="view-login">
+                <input type="text" id="login-username" class="input-field" placeholder="Username" maxlength="12">
+                <input type="password" id="login-password" class="input-field" placeholder="Password">
+                <button class="start-btn" onclick="processLogin()">Enter Arcade 🚀</button>
+            </div>
+
+            <div id="view-register" style="display: none;">
+                <input type="text" id="reg-username" class="input-field" placeholder="Choose a Username" maxlength="12">
+                <input type="password" id="reg-password" class="input-field" placeholder="Create a Password">
+                <p style="color: #94a3b8; font-size: 14px; margin-bottom: 5px;">Choose your Avatar:</p>
+                <div class="avatar-grid" id="avatar-selection">
+                    <div class="avatar-option selected" onclick="selectAvatar(this, '🐉')">🐉</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🥷')">🥷</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🧙‍♂️')">🧙‍♂️</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🤖')">🤖</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '👽')">👽</div>
+                    <div class="avatar-option" onclick="selectAvatar(this, '🦄')">🦄</div>
+                </div>
+                <button class="start-btn" onclick="processRegister()">Create Account 🌟</button>
+            </div>
         </div>
     </div>
 
-    <div class="container">
+    <!-- LEVEL SELECTION MODAL -->
+    <div class="modal-overlay" id="level-modal" style="display: none;">
+        <div class="modal-content">
+            <h2>🎯 Choose Difficulty</h2>
+            <p style="color: #94a3b8; margin-bottom: 25px;">Which vocabulary list do you want to train with today?</p>
+            <button class="start-btn level-btn" onclick="selectLevel(1)">Level 1 (Core DSE)</button>
+            <button class="start-btn level-2-btn" onclick="selectLevel(2)">Level 2 (Advanced)</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container" id="main-container">
         <!-- DASHBOARD HUB -->
         <div class="dashboard-header">
             <div class="profile">
                 <div class="avatar" id="display-avatar">👾</div>
                 <div>
                     <h2 style="margin:0; color:#38bdf8;" id="display-name">Player</h2>
-                    <p style="margin:5px 0 0 0; color:#94a3b8;" id="rank-display">Rank: Bronze</p>
+                    <p style="margin:5px 0 0 0; color:#94a3b8;" id="level-display">Level: None</p>
                 </div>
             </div>
             <div class="stats-grid">
                 <div class="stat-box"><div class="stat-value" id="xp-display">0</div><div class="stat-label">Total XP</div></div>
                 <div class="stat-box"><div class="stat-value" id="streak-display">0</div><div class="stat-label">Streak</div></div>
+                <button class="logout-btn" onclick="logout()">Log Out 🚪</button>
             </div>
         </div>
 
         <div style="text-align:center; color:#fbbf24; font-weight:bold; margin-bottom:15px; height: 20px;" id="combo-msg"></div>
 
-        <!-- ARCADE MENU (7 TABS) -->
+        <!-- ARCADE MENU -->
         <div class="arcade-menu">
-            <button class="tab-btn active" onclick="switchTab('study')" id="tab-study">📚 Flashcards</button>
-            <button class="tab-btn" onclick="switchTab('game-1')" id="tab-game-1">📖 Meaning</button>
-            <button class="tab-btn" onclick="switchTab('game-2')" id="tab-game-2">🎭 Tone</button>
-            <button class="tab-btn" onclick="switchTab('game-3')" id="tab-game-3">🧩 Context</button>
-            <button class="tab-btn" onclick="switchTab('game-4')" id="tab-game-4">🎧 Audio</button>
+            <!-- FLASHCARD TAB PROMINENTLY FIRST -->
+            <button class="tab-btn active" onclick="switchTab('study')" id="tab-study" style="background:#2563eb; border-color:#3b82f6;">📚 Flashcards</button>
+            
+            <div class="menu-group">
+                <div class="menu-group-label">📖 Reading</div>
+                <button class="tab-btn" onclick="switchTab('game-1')" id="tab-game-1" style="margin-top: 0;">Meaning</button>
+                <button class="tab-btn" onclick="switchTab('game-2')" id="tab-game-2" style="margin-top: 0;">Tone</button>
+                <button class="tab-btn" onclick="switchTab('game-3')" id="tab-game-3" style="margin-top: 0;">Context</button>
+            </div>
+            <button class="tab-btn" onclick="switchTab('game-4')" id="tab-game-4" style="border-color: #a855f7;">🎧 Listening</button>
             <button class="tab-btn" onclick="switchTab('game-5')" id="tab-game-5" style="border-color: #f59e0b;">✍️ Writing</button>
+            <button class="tab-btn" onclick="switchTab('corrections')" id="tab-corrections" style="border-color: #ef4444; color: #fca5a5;">⚠️ Mistakes</button>
             <button class="tab-btn" onclick="switchTab('leaderboard')" id="tab-leaderboard" style="background:#0f3460; border-color:#e94560;">🏆 Ranks</button>
         </div>
 
         <!-- STUDY ZONE (FLASHCARDS) -->
         <div class="content-board active" id="study-board">
-            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Flashcard Library (150+ Words)</h3>
-            <p style="text-align:center; color: #94a3b8;">Click the card to flip it. Study before you play!</p>
+            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Flashcard Library</h3>
+            <p style="text-align:center; color: #94a3b8;">Click the card to flip it. Study your vocabulary before you play!</p>
             <div class="scene">
                 <div class="flashcard" id="flashcard" onclick="flipCard()">
                     <div class="flashcard-face flashcard-front" id="word-front"></div>
-                    <div class="flashcard-face flashcard-back" id="word-back"></div>
+                    <div class="flashcard-face flashcard-back">
+                        <div class="fc-mean" id="word-back"></div>
+                        <div class="fc-sent" id="word-sentence"></div>
+                    </div>
                 </div>
             </div>
             <div class="controls">
                 <button class="btn" onclick="prevCard()">◀ Prev</button>
                 <button class="btn" onclick="nextCard()">Next ▶</button>
             </div>
-            <div style="text-align:center; margin-top:10px; color:#64748b;" id="card-counter"></div>
+            <div style="text-align:center; margin-top:10px; color:#64748b; font-weight:bold;" id="card-counter"></div>
         </div>
 
         <!-- GAME 1: Meaning -->
         <div class="content-board" id="game-1-board">
-            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Match the Meaning</h3>
+            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Match the Meaning</h3>
             <div class="prompt-box" id="g1-prompt"></div>
             <div class="options-grid">
                 <button class="option-btn" id="g1-opt-0" onclick="checkG1(0)"></button> <button class="option-btn" id="g1-opt-1" onclick="checkG1(1)"></button>
@@ -160,9 +221,9 @@
             </div>
         </div>
 
-        <!-- GAME 2: Tone / Vibe Check -->
+        <!-- GAME 2: Tone -->
         <div class="content-board" id="game-2-board">
-            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Positive, Neutral, or Negative?</h3>
+            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Tone Check</h3>
             <div class="prompt-box" id="g2-prompt" style="font-size: 32px; font-weight: bold;"></div>
             <div class="vibe-grid">
                 <button class="option-btn vibe-btn-pos" onclick="checkG2('pos')">😊 Positive</button>
@@ -171,9 +232,9 @@
             </div>
         </div>
 
-        <!-- GAME 3: Context Sentence -->
+        <!-- GAME 3: Context -->
         <div class="content-board" id="game-3-board">
-            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Fill in the Blank</h3>
+            <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Contextual Blank</h3>
             <div class="prompt-box" id="g3-prompt" style="font-style: italic;"></div>
             <div class="options-grid">
                 <button class="option-btn" id="g3-opt-0" onclick="checkG3(0)"></button> <button class="option-btn" id="g3-opt-1" onclick="checkG3(1)"></button>
@@ -181,333 +242,298 @@
             </div>
         </div>
 
-        <!-- GAME 4: AUDIO DROP -->
-        <div class="content-board" id="game-4-board">
-            <h3 style="text-align:center; color:#a855f7; margin-top:0;">Listen & Match</h3>
-            <p style="text-align:center; color:#94a3b8;">Click PLAY, listen to the sentence, and choose the missing word.</p>
+        <!-- GAME 4: Listening -->
+        <div class="content-board" id="game-4-board" style="border-color: #a855f7;">
+            <h3 style="text-align:center; color:#a855f7; margin-top:0;">🎧 Listening Practice</h3>
             <div style="text-align: center; margin-bottom: 20px;">
                 <button class="start-btn" id="play-audio-btn" onclick="playAudio()" style="background:#a855f7; width: auto; font-size: 20px; padding: 10px 30px;">▶️ PLAY AUDIO</button>
             </div>
-            <div class="prompt-box" id="g4-prompt" style="font-style: italic; border-color: #a855f7;">Loading...</div>
+            <div class="prompt-box" id="g4-prompt" style="font-style: italic; border-color: #a855f7;"></div>
             <div class="options-grid">
                 <button class="option-btn" id="g4-opt-0" onclick="checkG4(0)"></button> <button class="option-btn" id="g4-opt-1" onclick="checkG4(1)"></button>
                 <button class="option-btn" id="g4-opt-2" onclick="checkG4(2)"></button> <button class="option-btn" id="g4-opt-3" onclick="checkG4(3)"></button>
             </div>
         </div>
 
-        <!-- GAME 5: WRITING (SENTENCE BUILDER) -->
+        <!-- GAME 5: Writing -->
         <div class="content-board" id="game-5-board" style="border-color: #f59e0b;">
-            <h3 style="text-align:center; color:#f59e0b; margin-top:0;">Syntax Builder (Writing)</h3>
-            <p style="text-align:center; color:#94a3b8;">Click the words in the correct order to rebuild the sentence.</p>
-            
-            <!-- Where built sentence goes -->
+            <h3 style="text-align:center; color:#f59e0b; margin-top:0;">✍️ Writing: Syntax Builder</h3>
+            <p style="text-align:center; color:#94a3b8;">Click the words to rebuild the sentence.</p>
             <div class="answer-slot" id="g5-answer-box"></div>
-            
-            <!-- Scrambled word bank -->
             <div id="g5-word-bank" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px;"></div>
+        </div>
+
+        <!-- CORRECTIONS -->
+        <div class="content-board" id="corrections-board" style="border-color: #ef4444;">
+            <h3 style="text-align:center; color:#ef4444; margin-top:0; font-size: 28px;">⚠️ Your Mistakes Bank</h3>
+            <div id="mistakes-list" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;"></div>
+            <div style="text-align:center; margin-top:30px;" id="clear-mistakes-container">
+                <button class="btn" style="background:#ef4444; width:auto;" onclick="clearMistakes()">Clear All Mistakes</button>
+            </div>
         </div>
 
         <!-- LEADERBOARD -->
         <div class="content-board" id="leaderboard-board" style="border-color: #e94560;">
             <h3 style="text-align:center; color:#e94560; margin-top:0; font-size: 28px;">👑 Global Rankings</h3>
+            <div style="text-align:center; margin-bottom: 20px;">
+                <button class="time-btn" id="lb-week" onclick="renderLeaderboard('weekly')">This Week</button>
+                <button class="time-btn" id="lb-month" onclick="renderLeaderboard('monthly')">This Month</button>
+                <button class="time-btn active" id="lb-all" onclick="renderLeaderboard('overall')">All Time</button>
+            </div>
             <table class="leaderboard-table" id="leaderboard-body"></table>
         </div>
     </div>
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- MASSIVE 150+ WORD DATABASE (Verbs, Nouns, Adjectives, Connectors) ---
-        // Format packed to ensure complete code generation.
-        const vocabList = [
-            { w: "abandon", m: "To leave behind", t: "neg", s: "They had to ___ the sinking ship." },
+        // --- LEVEL 1 VOCABULARY (Core Survival) ---
+        const vocab_L1 = [
+            { w: "abandon", m: "To leave behind completely", t: "neg", s: "They had to ___ the sinking ship." },
             { w: "abolish", m: "To officially end a law", t: "neu", s: "The government should ___ the unfair rule." },
-            { w: "absorb", m: "To take in liquid or knowledge", t: "neu", s: "Sponges easily ___ spilled water." },
             { w: "accelerate", m: "To speed up", t: "pos", s: "Press the pedal to ___ the car." },
-            { w: "accommodate", m: "To provide space for", t: "pos", s: "The hotel can ___ 500 guests." },
             { w: "accomplish", m: "To achieve successfully", t: "pos", s: "You will ___ great things with hard work." },
             { w: "accumulate", m: "To gather over time", t: "neu", s: "Dust will ___ if you don't clean." },
             { w: "accuse", m: "To say someone did wrong", t: "neg", s: "Do not ___ him without solid proof." },
             { w: "adapt", m: "To adjust to new conditions", t: "pos", s: "Animals must ___ to survive winter." },
-            { w: "address", m: "To deal with an issue", t: "neu", s: "We must ___ the problem of pollution." },
-            { w: "admit", m: "To confess", t: "neu", s: "He had to ___ that he made a mistake." },
-            { w: "adopt", m: "To take up a new idea", t: "pos", s: "The school will ___ a new teaching method." },
-            { w: "advance", m: "To move forward", t: "pos", s: "Technology continues to ___ rapidly." },
-            { w: "advocate", m: "To publicly support", t: "pos", s: "Many students ___ for healthier school lunches." },
-            { w: "alleviate", m: "To make pain less severe", t: "pos", s: "Medicine will help ___ your headache." },
-            { w: "alter", m: "To change slightly", t: "neu", s: "You can ___ the settings in the menu." },
+            { w: "advocate", m: "To publicly support", t: "pos", s: "Many students ___ for healthier lunches." },
             { w: "analyze", m: "To examine in detail", t: "neu", s: "Scientists will ___ the data carefully." },
-            { w: "anticipate", m: "To expect to happen", t: "neu", s: "We ___ a large crowd at the concert." },
             { w: "apologize", m: "To say sorry", t: "pos", s: "You should ___ for being late." },
-            { w: "appeal", m: "To be attractive", t: "pos", s: "The new phone will ___ to teenagers." },
-            { w: "approach", m: "To move towards", t: "neu", s: "Slow down as you ___ the corner." },
-            { w: "approve", m: "To officially agree", t: "pos", s: "The principal must ___ the event." },
-            { w: "argue", m: "To disagree angrily", t: "neg", s: "Brothers often ___ over silly things." },
-            { w: "assemble", m: "To gather together", t: "neu", s: "Students will ___ in the school hall." },
-            { w: "assess", m: "To judge value or quality", t: "neu", s: "The teacher will ___ your speaking skills." },
-            { w: "assign", m: "To give a task", t: "neu", s: "The boss will ___ the project to John." },
-            { w: "assist", m: "To help", t: "pos", s: "Please ___ the elderly crossing the street." },
-            { w: "assume", m: "To believe without proof", t: "neg", s: "Do not ___ things you don't know." },
-            { w: "attempt", m: "To try", t: "neu", s: "He will ___ to break the world record." },
-            { w: "attract", m: "To draw interest", t: "pos", s: "Flowers ___ bees with their bright colors." },
-            { w: "avoid", m: "To keep away from", t: "neu", s: "You should ___ eating too much sugar." },
-            { w: "ban", m: "To legally forbid", t: "neg", s: "The city will ___ plastic bags next year." },
             { w: "benefit", m: "To gain an advantage", t: "pos", s: "Exercise will greatly ___ your health." },
-            { w: "blame", m: "To hold responsible for bad things", t: "neg", s: "Do not ___ others for your mistakes." },
-            { w: "boost", m: "To increase or improve", t: "pos", s: "Coffee can ___ your energy levels." },
-            { w: "calculate", m: "To figure out using math", t: "neu", s: "Use a calculator to ___ the total cost." },
-            { w: "capture", m: "To catch or record", t: "neu", s: "Use a camera to ___ the beautiful sunset." },
-            { w: "celebrate", m: "To enjoy a happy event", t: "pos", s: "We will ___ her birthday tomorrow." },
-            { w: "challenge", m: "To invite to a contest", t: "neu", s: "I ___ you to a game of chess." },
-            { w: "clarify", m: "To make clear", t: "pos", s: "Please ___ what you mean by that statement." },
-            { w: "collaborate", m: "To work together", t: "pos", s: "The two schools will ___ on the project." },
-            { w: "combat", m: "To fight against", t: "pos", s: "We must ___ global warming immediately." },
-            { w: "combine", m: "To join together", t: "neu", s: "You must ___ the ingredients in a bowl." },
-            { w: "commit", m: "To promise to do something", t: "pos", s: "You must ___ to studying every day." },
-            { w: "communicate", m: "To share information", t: "pos", s: "Humans ___ using language and gestures." },
-            { w: "compare", m: "To look for differences", t: "neu", s: "Let us ___ the prices of the two phones." },
-            { w: "compel", m: "To force someone to do something", t: "neg", s: "The rain will ___ us to stay indoors." },
-            { w: "compensate", m: "To pay for a loss", t: "neu", s: "The company will ___ you for the damage." },
-            { w: "compete", m: "To try to win against others", t: "neu", s: "Many athletes will ___ in the Olympics." },
+            { w: "collaborate", m: "To work together", t: "pos", s: "The schools will ___ on the project." },
             { w: "complain", m: "To say you are unhappy", t: "neg", s: "Customers will ___ if the food is cold." },
-            // Adjectives
             { w: "abundant", m: "More than enough", t: "pos", s: "The farm had an ___ harvest of apples." },
-            { w: "accurate", m: "Exactly correct", t: "pos", s: "Make sure your answers are ___." },
-            { w: "active", m: "Moving around a lot", t: "pos", s: "Children need to be energetic and ___." },
-            { w: "adequate", m: "Enough for a purpose", t: "pos", s: "Make sure you drink an ___ amount of water." },
-            { w: "adverse", m: "Harmful or negative", t: "neg", s: "Smoking has an ___ effect on your lungs." },
             { w: "aggressive", m: "Ready to attack", t: "neg", s: "The angry dog became very ___." },
-            { w: "alternative", m: "Another choice", t: "neu", s: "We need to find an ___ route home." },
-            { w: "ambiguous", m: "Having multiple meanings", t: "neg", s: "The instructions were confusing and ___." },
-            { w: "ambitious", m: "Strong desire to succeed", t: "pos", s: "The ___ student wants to be a doctor." },
-            { w: "ancient", m: "Very old", t: "neu", s: "We visited an ___ temple in Japan." },
-            { w: "anonymous", m: "Unknown name", t: "neu", s: "The donation was made by an ___ person." },
-            { w: "apparent", m: "Clearly visible", t: "neu", s: "It became ___ that he was lying." },
-            { w: "appealing", m: "Attractive", t: "pos", s: "The new video game looks very ___." },
-            { w: "appropriate", m: "Suitable for the situation", t: "pos", s: "Wear clothes that are ___ for a wedding." },
-            { w: "artificial", m: "Fake; human-made", t: "neu", s: "This candy contains ___ flavors." },
             { w: "authentic", m: "Genuine and real", t: "pos", s: "We ate ___ Italian food in Tokyo." },
-            { w: "awful", m: "Very bad", t: "neg", s: "The rotten egg smelled absolutely ___." },
-            { w: "basic", m: "Simple and essential", t: "neu", s: "You must learn the ___ rules first." },
-            { w: "beneficial", m: "Helpful and good", t: "pos", s: "Eating vegetables is ___ to your health." },
-            { w: "bitter", m: "Angry or sharp tasting", t: "neg", s: "Black coffee has a very ___ taste." },
-            { w: "brilliant", m: "Very smart or bright", t: "pos", s: "Albert Einstein was a ___ scientist." },
-            { w: "cautious", m: "Careful to avoid danger", t: "neu", s: "Be ___ when crossing the busy street." },
-            { w: "chronic", m: "Lasting a long time (bad)", t: "neg", s: "My grandfather suffers from ___ back pain." },
-            { w: "classic", m: "Typical of its kind", t: "pos", s: "Romeo and Juliet is a ___ love story." },
-            { w: "clear", m: "Easy to understand", t: "pos", s: "The teacher gave very ___ instructions." },
-            { w: "complex", m: "Having many parts", t: "neu", s: "The human brain is a ___ organ." },
-            { w: "comprehensive", m: "Complete and thorough", t: "pos", s: "The report provided a ___ summary." },
-            { w: "confident", m: "Sure of oneself", t: "pos", s: "She felt very ___ before the exam." },
-            { w: "confused", m: "Unable to think clearly", t: "neg", s: "The difficult math problem left me ___." },
-            { w: "conscious", m: "Aware of surroundings", t: "neu", s: "The patient was awake and fully ___." },
-            { w: "consistent", m: "Unchanging over time", t: "pos", s: "You must practice to see ___ results." },
-            { w: "constant", m: "Occurring continuously", t: "neu", s: "The machine made a ___ humming noise." },
-            { w: "controversial", m: "Causing disagreement", t: "neg", s: "The new school rule was highly ___." },
-            { w: "conventional", m: "Traditional and standard", t: "neu", s: "He prefers a ___ approach to teaching." },
-            { w: "creative", m: "Having great imagination", t: "pos", s: "Artists are usually very ___ people." },
-            { w: "critical", m: "Expressing disapproval or essential", t: "neu", s: "Water is ___ for human survival." },
             { w: "crucial", m: "Extremely important", t: "pos", s: "It is ___ to read the question carefully." },
-            { w: "curious", m: "Eager to learn", t: "pos", s: "Cats are very ___ animals." },
             { w: "dangerous", m: "Able to cause harm", t: "neg", s: "Playing with fire is extremely ___." },
-            { w: "delicate", m: "Easily broken", t: "neu", s: "The glass vase is very ___." },
-            // Nouns
-            { w: "ability", m: "Skill to do something", t: "pos", s: "Birds have the ___ to fly." },
-            { w: "absence", m: "Being away", t: "neg", s: "His ___ from class was noticed." },
-            { w: "access", m: "Means of approaching", t: "pos", s: "Students have free ___ to the library." },
-            { w: "accident", m: "Unexpected bad event", t: "neg", s: "He broke his arm in a car ___." },
-            { w: "achievement", m: "A successful result", t: "pos", s: "Winning the gold medal is a huge ___." },
-            { w: "advantage", m: "A favorable situation", t: "pos", s: "Being tall is a big ___ in basketball." },
-            { w: "alternative", m: "Another option", t: "neu", s: "We need an ___ plan just in case." },
-            { w: "analysis", m: "Detailed examination", t: "neu", s: "The scientist conducted a deep data ___." },
-            { w: "anxiety", m: "A feeling of worry", t: "neg", s: "Exams often cause a lot of ___." },
-            { w: "approach", m: "A way of dealing with things", t: "neu", s: "We need a new ___ to this problem." },
-            { w: "aspect", m: "A particular feature", t: "neu", s: "Grammar is an important ___ of English." },
-            { w: "assessment", m: "Evaluation of something", t: "neu", s: "The teacher gave us a speaking ___." },
-            { w: "assumption", m: "Accepted as true without proof", t: "neg", s: "You made a false ___ about me." },
-            { w: "attempt", m: "An effort to do something", t: "neu", s: "This is his second ___ to pass the test." },
-            { w: "attitude", m: "Way of thinking", t: "neu", s: "She always has a positive ___ towards learning." },
-            { w: "authority", m: "Power to give orders", t: "neu", s: "The police have the ___ to arrest people." },
+            { w: "achievement", m: "A successful result", t: "pos", s: "Winning the medal is a huge ___." },
             { w: "barrier", m: "An obstacle", t: "neg", s: "Language can be a ___ to communication." },
-            { w: "benefit", m: "An advantage or profit", t: "pos", s: "One ___ of exercise is better sleep." },
-            { w: "bias", m: "Unfair prejudice", t: "neg", s: "A judge must not show any ___." },
-            { w: "burden", m: "A heavy load", t: "neg", s: "Homework should not be a heavy ___." },
-            { w: "capacity", m: "Maximum amount", t: "neu", s: "The stadium has a ___ of 50,000 people." },
-            { w: "category", m: "A class or group", t: "neu", s: "Apples belong in the fruit ___." },
-            { w: "challenge", m: "A difficult task", t: "neu", s: "Climbing the mountain was a huge ___." },
-            { w: "characteristic", m: "A typical feature", t: "neu", s: "A key ___ of mammals is having hair." },
-            { w: "circumstance", m: "Fact related to an event", t: "neu", s: "I cannot help you under this ___." },
-            { w: "colleague", m: "A person you work with", t: "neu", s: "My father is having dinner with a ___." },
-            { w: "combination", m: "Joining different parts", t: "neu", s: "Pink is a ___ of red and white." },
-            { w: "community", m: "Group living together", t: "pos", s: "We must help the poor in our ___." },
-            { w: "component", m: "A part of a whole", t: "neu", s: "The battery is a key ___ of the phone." },
-            { w: "concept", m: "An abstract idea", t: "neu", s: "Time travel is an interesting ___." },
-            { w: "conclusion", m: "The end result", t: "neu", s: "What is your final ___ on this matter?" },
-            { w: "conflict", m: "A serious disagreement", t: "neg", s: "There is a ___ between the two countries." },
-            { w: "consensus", m: "A general agreement", t: "pos", s: "The group finally reached a ___." },
-            { w: "consequence", m: "A result or effect", t: "neg", s: "Failing is the ___ of not studying." },
-            { w: "contribution", m: "A gift or payment", t: "pos", s: "He made a great ___ to science." },
-            { w: "controversy", m: "Public disagreement", t: "neg", s: "The new law caused a lot of ___." },
-            { w: "crisis", m: "A time of great difficulty", t: "neg", s: "The city faced a financial ___." },
-            { w: "debate", m: "A formal discussion", t: "neu", s: "The students had a ___ about school rules." },
-            // Connectors (Adverbs)
-            { w: "accordingly", m: "Therefore", t: "neu", s: "He was sick; ___, he stayed home." },
-            { w: "accurately", m: "Correctly and precisely", t: "pos", s: "Please answer the questions ___." },
-            { w: "actually", m: "As the truth or facts", t: "neu", s: "I thought it was a dog, but it was ___ a wolf." },
-            { w: "additionally", m: "As an extra factor", t: "neu", s: "The phone is cheap; ___, it is very fast." },
-            { w: "alternatively", m: "As another option", t: "neu", s: "We can walk; ___, we can take a bus." },
-            { w: "although", m: "In spite of the fact that", t: "neu", s: "___ it was raining, we played football." },
-            { w: "always", m: "At all times", t: "neu", s: "You must ___ wear a seatbelt in a car." },
-            { w: "apparently", m: "As far as one can see", t: "neu", s: "___, the test has been canceled." },
-            { w: "approximately", m: "Roughly; around", t: "neu", s: "The journey will take ___ two hours." },
-            { w: "automatically", m: "Without human control", t: "neu", s: "The doors open ___ when you approach." },
-            { w: "barely", m: "Only just; almost not", t: "neg", s: "The music was so quiet I could ___ hear it." },
-            { w: "basically", m: "Fundamentally", t: "neu", s: "The two phones are ___ the same." },
-            { w: "briefly", m: "For a short time", t: "neu", s: "Let me explain the rules very ___." },
-            { w: "carefully", m: "With great attention", t: "pos", s: "You must read the instructions ___." },
-            { w: "certainly", m: "Without a doubt", t: "pos", s: "I will ___ help you with your homework." },
-            { w: "clearly", m: "Easy to see", t: "pos", s: "You must speak loudly and ___." },
-            { w: "closely", m: "With careful attention", t: "neu", s: "Watch the magician's hands very ___." },
-            { w: "commonly", m: "Very often", t: "neu", s: "English is ___ spoken around the world." },
-            { w: "completely", m: "Totally", t: "neu", s: "The building was ___ destroyed by the fire." },
-            { w: "consequently", m: "As a result", t: "neu", s: "He didn't study; ___, he failed." },
-            { w: "constantly", m: "Continuously", t: "neu", s: "The baby cried ___ throughout the night." },
-            { w: "conversely", m: "In an opposite way", t: "neu", s: "You can add ice; ___, you can heat it." },
-            { w: "currently", m: "At the present time", t: "neu", s: "I am ___ busy with my homework." },
-            { w: "definitely", m: "Without doubt", t: "pos", s: "I will ___ pass the exam this time." },
-            { w: "deliberately", m: "On purpose", t: "neg", s: "He ___ broke the window because he was angry." },
-            { w: "despite", m: "Without being affected by", t: "neu", s: "___ the rain, we still went hiking." },
-            { w: "directly", m: "With nothing in between", t: "neu", s: "Go ___ to the principal's office." },
-            { w: "easily", m: "Without difficulty", t: "pos", s: "She won the race very ___." },
-            { w: "effectively", m: "Producing desired result", t: "pos", s: "You must manage your time ___." },
-            { w: "entirely", m: "Completely", t: "neu", s: "The fault was ___ mine." },
-            { w: "especially", m: "To a great extent", t: "neu", s: "I love fruits, ___ sweet apples." },
-            { w: "essentially", m: "Basically", t: "neu", s: "Water is ___ required for all life." },
             { w: "eventually", m: "In the end", t: "neu", s: "Keep trying, and you will succeed ___." },
-            { w: "exactly", m: "In exact terms", t: "neu", s: "Follow the recipe ___ as it is written." },
-            { w: "extremely", m: "To a very great degree", t: "neu", s: "The weather in summer is ___ hot." },
-            { w: "furthermore", m: "In addition", t: "neu", s: "It is cheap; ___, the quality is good." },
-            { w: "generally", m: "In most cases", t: "neu", s: "Cats are ___ afraid of water." },
-            { w: "hardly", m: "Almost not", t: "neg", s: "I was so tired I could ___ keep my eyes open." },
-            { w: "hence", m: "As a consequence", t: "neu", s: "It rained; ___, the ground is wet." },
-            { w: "honestly", m: "In a truthful way", t: "pos", s: "You must answer the questions ___." },
-            { w: "ironically", m: "Contrary to expectations", t: "neg", s: "___, the fire station burned down." },
-            { w: "moreover", m: "As a further matter", t: "neu", s: "The car is fast; ___, it is very safe." },
-            { w: "nevertheless", m: "In spite of that", t: "neu", s: "It was dangerous; ___, he saved the cat." },
-            { w: "unfortunately", m: "It is unlucky that", t: "neg", s: "___, we missed the last train home." }
+            { w: "frequent", m: "Happening often", t: "neu", s: "Typhoons are very ___ in summer." },
+            { w: "generate", m: "To produce or create", t: "pos", s: "Solar panels ___ clean energy." },
+            { w: "hesitate", m: "To pause before acting", t: "neg", s: "Do not ___ to ask questions." },
+            { w: "identify", m: "To recognize", t: "neu", s: "Can you ___ the man in the photo?" }
         ];
 
-        // --- GHOST PLAYERS ---
-        const rivalPlayers = [
-            { name: "Jason (5A)", avatar: "🦁", xp: 3200 }, { name: "Kelly (5B)", avatar: "🦊", xp: 2100 },
-            { name: "Marco (5A)", avatar: "🐺", xp: 1400 }, { name: "Sammy (5C)", avatar: "🦉", xp: 850 },
-            { name: "Tina (5B)", avatar: "🐼", xp: 300 }
+        // --- LEVEL 2 VOCABULARY (Advanced DSE) ---
+        const vocab_L2 = [
+            { w: "abundance", m: "A very large quantity", t: "pos", s: "There is an ___ of food at the buffet." },
+            { w: "abuse", m: "To use improperly or harmfully", t: "neg", s: "Leaders should not ___ their power." },
+            { w: "access", m: "The right to enter or use", t: "neu", s: "Students have free ___ to the library." },
+            { w: "accident", m: "An unfortunate incident", t: "neg", s: "He was injured in a car ___." },
+            { w: "accommodation", m: "A place to live or stay", t: "neu", s: "The hotel provides excellent ___." },
+            { w: "accompany", m: "To go somewhere with someone", t: "neu", s: "I will ___ you to the hospital." },
+            { w: "account", m: "A record or report", t: "neu", s: "He gave a detailed ___ of the event." },
+            { w: "accuracy", m: "The state of being exact", t: "pos", s: "Check your math for ___." },
+            { w: "accustomed", m: "Familiar with something", t: "neu", s: "I am not ___ to waking up so early." },
+            { w: "acknowledge", m: "To accept or admit truth", t: "pos", s: "You must ___ your mistakes to grow." },
+            { w: "acquire", m: "To get or buy something", t: "pos", s: "The museum will ___ a new painting." },
+            { w: "activity", m: "A thing that a person does", t: "neu", s: "Running is a healthy physical ___." },
+            { w: "addiction", m: "Cannot stop doing something harmful", t: "neg", s: "He sought help for his gambling ___." },
+            { w: "addition", m: "The action of adding", t: "neu", s: "The new gym is a great ___ to the school." },
+            { w: "administration", m: "Management of a business", t: "neu", s: "The hospital ___ changed the rules." },
+            { w: "adolescence", m: "Period between childhood and adult", t: "neu", s: "Teenagers go through ___." },
+            { w: "adoption", m: "Legally taking another's child", t: "pos", s: "The couple finalized the ___." },
+            { w: "adult", m: "A fully grown person", t: "neu", s: "You are legally an ___ at 18." },
+            { w: "advance", m: "Forward movement or progress", t: "pos", s: "There was a huge ___ in technology." },
+            { w: "advantage", m: "A condition giving success", t: "pos", s: "Height is an ___ in basketball." },
+            { w: "consequently", m: "As a result", t: "neu", s: "He didn't study; ___, he failed." },
+            { w: "furthermore", m: "In addition to what has been said", t: "neu", s: "It is cheap; ___, it is high quality." },
+            { w: "nevertheless", m: "In spite of that", t: "neu", s: "It was cold; ___, we went swimming." },
+            { w: "evaluate", m: "To judge how good or bad something is", t: "neu", s: "The teacher will ___ your speaking skills." },
+            { w: "justify", m: "To give a good reason for", t: "neu", s: "You must ___ your answer with evidence." }
         ];
 
-        // --- GLOBAL STATE ---
-        let playerProfile = { name: "", avatar: "🐉", xp: 0 };
+        let activeVocab = []; 
+
+        // --- GHOST PLAYERS GENERATOR ---
+        const ghostNames = ["Jason (5A)", "Kelly (5B)", "Marco (5A)", "Sammy (5C)", "Tina (5B)", "Alex (5A)", "Rachel (5C)"];
+        let rivalPlayers = [];
+        
+        function generateGhosts() {
+            let ghosts = [];
+            let now = Date.now();
+            let oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
+            
+            ghostNames.forEach(name => {
+                let xpLog = [];
+                let totalTargetXP = Math.floor(Math.random() * 3500) + 500; 
+                let currentXP = 0;
+                while(currentXP < totalTargetXP) {
+                    let points = (Math.random() > 0.8) ? 200 : 100;
+                    let randomTime = oneWeekAgo + Math.random() * (now - oneWeekAgo);
+                    xpLog.push({ xp: points, ts: randomTime });
+                    currentXP += points;
+                }
+                let avatars = ["🦁", "🦊", "🐺", "🦉", "🐼", "🐯", "🐨"];
+                let avatar = avatars[Math.floor(Math.random() * avatars.length)];
+                ghosts.push({ name: name, avatar: avatar, xpLog: xpLog });
+            });
+            return ghosts;
+        }
+
+        // --- GLOBAL AUTH & DATABASE STATE ---
+        const DB_KEY = "dseArcadeUsersDB_vFinal"; 
+        const CURRENT_USER_KEY = "dseArcadeCurrentUser_vFinal";
+        
+        let usersDB = {}; 
+        let currentUser = null;
         let currentStreak = 0;
         let isWaiting = false;
         let activeTab = 'study';
         let fIndex = 0;
+        let tempAvatar = "🐉";
 
-        // --- INIT & LOCAL STORAGE ---
+        // --- INIT ---
         function initApp() {
-            let savedData = localStorage.getItem("dseArcadeV7");
-            if (savedData) {
-                playerProfile = JSON.parse(savedData);
-                document.getElementById("setup-modal").style.display = "none";
-                updateDashboard();
+            let savedGhosts = localStorage.getItem("dseArcadeGhosts_vFinal");
+            if (savedGhosts) {
+                rivalPlayers = JSON.parse(savedGhosts);
+            } else {
+                rivalPlayers = generateGhosts();
+                localStorage.setItem("dseArcadeGhosts_vFinal", JSON.stringify(rivalPlayers));
             }
-            showCard();
-            loadG1(); loadG2(); loadG3(); loadG4(); loadG5();
+
+            let db = localStorage.getItem(DB_KEY);
+            if (db) usersDB = JSON.parse(db);
+            
+            let loggedInUser = localStorage.getItem(CURRENT_USER_KEY);
+            if (loggedInUser && usersDB[loggedInUser]) {
+                currentUser = loggedInUser;
+                document.getElementById("auth-modal").style.display = "none";
+                document.getElementById("level-modal").style.display = "flex"; 
+            }
         }
 
-        let tempAvatar = "🐉";
+        // --- AUTHENTICATION LOGIC ---
+        function switchAuthMode(mode) {
+            document.getElementById("auth-error").innerText = "";
+            if(mode === 'login') {
+                document.getElementById("tab-login").classList.add("active"); document.getElementById("tab-register").classList.remove("active");
+                document.getElementById("view-login").style.display = "block"; document.getElementById("view-register").style.display = "none";
+            } else {
+                document.getElementById("tab-register").classList.add("active"); document.getElementById("tab-login").classList.remove("active");
+                document.getElementById("view-register").style.display = "block"; document.getElementById("view-login").style.display = "none";
+            }
+        }
         function selectAvatar(element, icon) {
             document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
-            element.classList.add('selected');
-            tempAvatar = icon;
+            element.classList.add('selected'); tempAvatar = icon;
         }
+        function processRegister() {
+            let user = document.getElementById("reg-username").value.trim();
+            let pass = document.getElementById("reg-password").value.trim();
+            let err = document.getElementById("auth-error");
+            
+            if(user === "" || pass === "") { err.innerText = "Please fill in all fields."; return; }
+            if(usersDB[user]) { err.innerText = "Username exists. Please login."; return; }
+            
+            usersDB[user] = { password: pass, avatar: tempAvatar, xpLog: [], mistakes: [] };
+            localStorage.setItem(DB_KEY, JSON.stringify(usersDB));
+            
+            currentUser = user; 
+            localStorage.setItem(CURRENT_USER_KEY, currentUser);
+            
+            document.getElementById("auth-modal").style.display = "none"; 
+            document.getElementById("level-modal").style.display = "flex"; 
+        }
+        function processLogin() {
+            let user = document.getElementById("login-username").value.trim();
+            let pass = document.getElementById("login-password").value.trim();
+            let err = document.getElementById("auth-error");
+            
+            if(user === "" || pass === "") { err.innerText = "Please enter username and password."; return; }
+            if(!usersDB[user]) { err.innerText = "Username not found. Please register."; return; }
+            if(usersDB[user].password !== pass) { err.innerText = "Incorrect password."; return; }
+            
+            if(!usersDB[user].xpLog) usersDB[user].xpLog = [];
+            if(!usersDB[user].mistakes) usersDB[user].mistakes = []; 
+            
+            currentUser = user; 
+            localStorage.setItem(CURRENT_USER_KEY, currentUser);
+            
+            document.getElementById("auth-modal").style.display = "none"; 
+            document.getElementById("level-modal").style.display = "flex"; 
+        }
+        function logout() {
+            currentUser = null; 
+            localStorage.removeItem(CURRENT_USER_KEY);
+            document.getElementById("login-username").value = ""; document.getElementById("login-password").value = "";
+            document.getElementById("reg-username").value = ""; document.getElementById("reg-password").value = "";
+            document.getElementById("auth-error").innerText = ""; 
+            document.getElementById("main-container").classList.remove("active");
+            document.getElementById("auth-modal").style.display = "flex";
+        }
+        function saveData() { if(currentUser) localStorage.setItem(DB_KEY, JSON.stringify(usersDB)); }
 
-        function saveProfile() {
-            let nameInput = document.getElementById("player-name-input").value.trim();
-            if (nameInput === "") { alert("Please enter your nickname!"); return; }
-            playerProfile.name = nameInput;
-            playerProfile.avatar = tempAvatar;
-            playerProfile.xp = 0;
-            localStorage.setItem("dseArcadeV7", JSON.stringify(playerProfile));
-            document.getElementById("setup-modal").style.display = "none";
+        // --- LEVEL SELECTION & FLASHCARD SETUP ---
+        function startGameplay(level) {
+            // SET THE VOCAB DECK BASED ON LEVEL
+            activeVocab = (level === 1) ? vocab_L1 : vocab_L2;
+            
+            document.getElementById("level-modal").style.display = "none";
+            document.getElementById("main-container").classList.add("active");
+            
+            let lvlText = (level === 1) ? "Level 1: Core DSE" : "Level 2: Advanced";
+            document.getElementById("level-display").innerText = lvlText;
+            
+            // IMPORTANT: Reset flashcard index when a new level is chosen
+            fIndex = 0; 
+            
             updateDashboard();
+            switchTab('study'); // Load FLASHCARDS tab automatically!
         }
 
-        function saveData() { localStorage.setItem("dseArcadeV7", JSON.stringify(playerProfile)); }
+        // --- DASHBOARD & XP LOGIC ---
+        function calculateTotalXP(xpLogArray) {
+            return xpLogArray.reduce((total, log) => total + log.xp, 0);
+        }
 
-        // --- DASHBOARD & LEADERBOARD ---
         function updateDashboard() {
-            if(!playerProfile.name) return;
-            document.getElementById("display-name").innerText = playerProfile.name;
-            document.getElementById("display-avatar").innerText = playerProfile.avatar;
-            document.getElementById("xp-display").innerText = playerProfile.xp;
+            if(!currentUser) return;
+            let profile = usersDB[currentUser];
+            let totalXP = calculateTotalXP(profile.xpLog);
+            
+            document.getElementById("display-name").innerText = currentUser;
+            document.getElementById("display-avatar").innerText = profile.avatar;
+            document.getElementById("xp-display").innerText = totalXP;
             document.getElementById("streak-display").innerText = currentStreak;
             
             let streakEl = document.getElementById("streak-display"), comboMsg = document.getElementById("combo-msg");
-            if (currentStreak >= 3) {
-                streakEl.classList.add("on-fire");
-                comboMsg.innerText = "🔥 FIRE MODE: x2 POINTS ACTIVE! 🔥";
-            } else {
-                streakEl.classList.remove("on-fire");
-                comboMsg.innerText = "";
-            }
+            if (currentStreak >= 3) { streakEl.classList.add("on-fire"); comboMsg.innerText = "🔥 FIRE MODE: x2 POINTS ACTIVE! 🔥"; } 
+            else { streakEl.classList.remove("on-fire"); comboMsg.innerText = ""; }
 
             let rank = "Bronze";
-            if (playerProfile.xp > 1000) rank = "Silver";
-            if (playerProfile.xp > 2500) rank = "Gold";
-            if (playerProfile.xp > 4000) rank = "Diamond";
+            if (totalXP > 1000) rank = "Silver"; if (totalXP > 2500) rank = "Gold"; if (totalXP > 4000) rank = "Diamond";
             document.getElementById("rank-display").innerText = `Rank: ${rank}`;
-            renderLeaderboard();
+            
+            renderLeaderboard('overall'); 
         }
 
-        function renderLeaderboard() {
-            let allPlayers = [...rivalPlayers, { name: `${playerProfile.name} (You)`, avatar: playerProfile.avatar, xp: playerProfile.xp, isReal: true }];
-            allPlayers.sort((a, b) => b.xp - a.xp);
-            let tbody = `<tr><th>Rank</th><th>Player</th><th>Total XP</th></tr>`;
-            allPlayers.forEach((p, i) => {
-                let rankDisplay = i + 1;
-                if (i === 0) rankDisplay = `<span class="rank-1">1st 🏆</span>`;
-                if (i === 1) rankDisplay = `<span class="rank-2">2nd 🥈</span>`;
-                if (i === 2) rankDisplay = `<span class="rank-3">3rd 🥉</span>`;
-                tbody += `<tr class="${p.isReal ? 'is-player' : ''}"><td>${rankDisplay}</td><td>${p.avatar} ${p.name}</td><td>${p.xp} XP</td></tr>`;
-            });
-            document.getElementById("leaderboard-body").innerHTML = tbody;
-        }
+        function handleAnswerResult(isCorrect, boardId, targetWordStr = null) {
+            if(!currentUser) return;
+            const now = Date.now();
 
-        // --- FLASHCARD LOGIC ---
-        const flashcardEl = document.getElementById('flashcard');
-        function flipCard() { flashcardEl.classList.toggle('is-flipped'); }
-        function showCard() {
-            document.getElementById('word-front').innerText = vocabList[fIndex].w;
-            document.getElementById('word-back').innerText = vocabList[fIndex].m;
-            document.getElementById('card-counter').innerText = `Card ${fIndex + 1} of ${vocabList.length}`;
-            if(flashcardEl.classList.contains('is-flipped')) flipCard();
-        }
-        function nextCard() { fIndex = (fIndex + 1) % vocabList.length; showCard(); }
-        function prevCard() { fIndex = (fIndex - 1 + vocabList.length) % vocabList.length; showCard(); }
-
-        // --- GAME SYSTEM HELPERS ---
-        function handleAnswerResult(isCorrect, boardId) {
             if (isCorrect) {
                 currentStreak++;
-                playerProfile.xp += (currentStreak >= 3) ? 200 : 100;
+                let points = (currentStreak >= 3) ? 200 : 100;
+                usersDB[currentUser].xpLog.push({ xp: points, ts: now });
             } else {
                 currentStreak = 0;
-                playerProfile.xp = Math.max(0, playerProfile.xp - 50);
+                usersDB[currentUser].xpLog.push({ xp: -50, ts: now });
+                
                 document.getElementById(boardId).classList.add("shake");
                 setTimeout(() => document.getElementById(boardId).classList.remove("shake"), 400);
+                
+                if (targetWordStr && !usersDB[currentUser].mistakes.includes(targetWordStr)) {
+                    usersDB[currentUser].mistakes.push(targetWordStr);
+                }
             }
             saveData();
             updateDashboard();
         }
 
+        // --- TAB SWITCHER ---
         function switchTab(tabId) {
             if(isWaiting) return;
             activeTab = tabId;
@@ -515,22 +541,45 @@
             document.querySelectorAll('.content-board').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById(`${tabId}-board`).classList.add('active');
+            
+            // Trigger specific renders based on the tab chosen
+            if(tabId === 'study') showCard(); // Ensures flashcards load
+            if(tabId === 'game-1') loadG1();
+            if(tabId === 'game-2') loadG2();
+            if(tabId === 'game-3') loadG3();
+            if(tabId === 'game-4') loadG4();
+            if(tabId === 'game-5') loadG5();
+            if(tabId === 'corrections') renderCorrections();
+            if(tabId === 'leaderboard') renderLeaderboard('overall');
         }
+
+        // --- 📚 FLASHCARD LOGIC ---
+        const flashcardEl = document.getElementById('flashcard');
+        function flipCard() { flashcardEl.classList.toggle('is-flipped'); }
+        function showCard() {
+            // Load the current word from activeVocab onto the flashcard
+            document.getElementById('word-front').innerText = activeVocab[fIndex].w;
+            document.getElementById('word-back').innerText = "📖 " + activeVocab[fIndex].m;
+            document.getElementById('word-sentence').innerText = `"${activeVocab[fIndex].s.replace("___", `[ ${activeVocab[fIndex].w} ]`)}"`;
+            document.getElementById('card-counter').innerText = `Card ${fIndex + 1} of ${activeVocab.length}`;
+            if(flashcardEl.classList.contains('is-flipped')) flipCard();
+        }
+        function nextCard() { fIndex = (fIndex + 1) % activeVocab.length; showCard(); }
+        function prevCard() { fIndex = (fIndex - 1 + activeVocab.length) % activeVocab.length; showCard(); }
+
 
         // --- GAME 1: Meaning ---
         let g1Target, g1Options;
         function loadG1() {
             isWaiting = false;
-            let correctObj = vocabList[Math.floor(Math.random() * vocabList.length)];
-            g1Target = correctObj.w;
-            document.getElementById("g1-prompt").innerText = `"${correctObj.m}"`;
+            let correctObj = activeVocab[Math.floor(Math.random() * activeVocab.length)];
+            g1Target = correctObj.w; document.getElementById("g1-prompt").innerText = `"${correctObj.m}"`;
             let options = new Set([g1Target]);
-            while(options.size < 4) { options.add(vocabList[Math.floor(Math.random() * vocabList.length)].w); }
+            while(options.size < 4) { options.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w); }
             g1Options = Array.from(options).sort(() => Math.random() - 0.5);
             for(let i=0; i<4; i++) {
                 let btn = document.getElementById(`g1-opt-${i}`);
-                btn.innerText = g1Options[i];
-                btn.className = "option-btn";
+                btn.innerText = g1Options[i]; btn.className = "option-btn";
             }
         }
         function checkG1(index) {
@@ -539,7 +588,7 @@
             let isCorrect = (g1Options[index] === g1Target);
             if(isCorrect) btn.classList.add("correct-btn");
             else { btn.classList.add("wrong-btn"); document.getElementById(`g1-opt-${g1Options.indexOf(g1Target)}`).classList.add("correct-btn"); }
-            handleAnswerResult(isCorrect, "game-1-board");
+            handleAnswerResult(isCorrect, "game-1-board", g1Target);
             setTimeout(loadG1, 1200);
         }
 
@@ -548,7 +597,7 @@
         function loadG2() {
             isWaiting = false;
             ['pos', 'neu', 'neg'].forEach(v => document.querySelector(`.vibe-btn-${v}`).className = `option-btn vibe-btn-${v}`);
-            let correctObj = vocabList[Math.floor(Math.random() * vocabList.length)];
+            let correctObj = activeVocab[Math.floor(Math.random() * activeVocab.length)];
             g2TargetWord = correctObj.w; g2TargetSentiment = correctObj.t;
             document.getElementById("g2-prompt").innerText = g2TargetWord.toUpperCase();
         }
@@ -558,7 +607,7 @@
             let isCorrect = (chosenSentiment === g2TargetSentiment);
             if(isCorrect) btn.classList.add("correct-btn");
             else { btn.classList.add("wrong-btn"); document.querySelector(`.vibe-btn-${g2TargetSentiment}`).classList.add("correct-btn"); }
-            handleAnswerResult(isCorrect, "game-2-board");
+            handleAnswerResult(isCorrect, "game-2-board", g2TargetWord);
             setTimeout(loadG2, 1200);
         }
 
@@ -566,11 +615,11 @@
         let g3Target, g3Options, g3Sentence;
         function loadG3() {
             isWaiting = false;
-            let correctObj = vocabList[Math.floor(Math.random() * vocabList.length)];
+            let correctObj = activeVocab[Math.floor(Math.random() * activeVocab.length)];
             g3Target = correctObj.w; g3Sentence = correctObj.s;
             document.getElementById("g3-prompt").innerText = g3Sentence;
             let options = new Set([g3Target]);
-            while(options.size < 4) { options.add(vocabList[Math.floor(Math.random() * vocabList.length)].w); }
+            while(options.size < 4) { options.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w); }
             g3Options = Array.from(options).sort(() => Math.random() - 0.5);
             for(let i=0; i<4; i++) {
                 let btn = document.getElementById(`g3-opt-${i}`);
@@ -588,21 +637,21 @@
                 btn.classList.add("wrong-btn");
                 document.getElementById(`g3-opt-${g3Options.indexOf(g3Target)}`).classList.add("correct-btn");
             }
-            handleAnswerResult(isCorrect, "game-3-board");
+            handleAnswerResult(isCorrect, "game-3-board", g3Target);
             setTimeout(loadG3, 1500);
         }
 
-        // --- GAME 4: Audio ---
+        // --- GAME 4: Listening ---
         let g4Target, g4Options, g4Sentence;
         function loadG4() {
             isWaiting = false;
-            let correctObj = vocabList[Math.floor(Math.random() * vocabList.length)];
+            let correctObj = activeVocab[Math.floor(Math.random() * activeVocab.length)];
             g4Target = correctObj.w; g4Sentence = correctObj.s;
             document.getElementById("g4-prompt").innerText = g4Sentence.replace("___", "______");
             let playBtn = document.getElementById("play-audio-btn");
             playBtn.style.background = "#a855f7"; playBtn.innerText = "▶️ PLAY AUDIO";
             let options = new Set([g4Target]);
-            while(options.size < 4) { options.add(vocabList[Math.floor(Math.random() * vocabList.length)].w); }
+            while(options.size < 4) { options.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w); }
             g4Options = Array.from(options).sort(() => Math.random() - 0.5);
             for(let i=0; i<4; i++) {
                 let btn = document.getElementById(`g4-opt-${i}`);
@@ -619,7 +668,7 @@
                 playBtn.innerText = "🔊 PLAYING..."; playBtn.style.background = "#9333ea";
                 msg.onend = function() { playBtn.innerText = "▶️ PLAY AGAIN"; playBtn.style.background = "#a855f7"; };
                 window.speechSynthesis.speak(msg);
-            } else { alert("Your browser doesn't support text-to-speech!"); }
+            } else { alert("Your browser doesn't support audio!"); }
         }
         function checkG4(index) {
             if(isWaiting) return; isWaiting = true;
@@ -633,83 +682,122 @@
                 btn.classList.add("wrong-btn");
                 document.getElementById(`g4-opt-${g4Options.indexOf(g4Target)}`).classList.add("correct-btn");
             }
-            handleAnswerResult(isCorrect, "game-4-board");
+            handleAnswerResult(isCorrect, "game-4-board", g4Target);
             setTimeout(loadG4, 1500);
         }
 
-        // --- GAME 5: Syntax Builder (Writing) ---
-        let g5Original = [];
-        let g5Scrambled = [];
-        let g5Current = [];
-
+        // --- GAME 5: Writing (Syntax Builder) ---
+        let g5Original = [], g5Scrambled = [], g5Current = [], g5TargetWord = "";
         function loadG5() {
             isWaiting = false;
-            document.getElementById("g5-answer-box").className = "answer-slot"; // Reset colors
-            
-            // Pick a reasonable sentence
-            let correctObj = vocabList[Math.floor(Math.random() * vocabList.length)];
+            document.getElementById("g5-answer-box").className = "answer-slot"; 
+            let correctObj = activeVocab[Math.floor(Math.random() * activeVocab.length)];
+            g5TargetWord = correctObj.w;
             let fullSentence = correctObj.s.replace("___", correctObj.w);
-            
             g5Original = fullSentence.split(" ");
             g5Scrambled = [...g5Original].sort(() => Math.random() - 0.5);
             g5Current = [];
-            
             renderG5();
         }
-
         function renderG5() {
             let bankHtml = "";
-            g5Scrambled.forEach((word, index) => {
-                bankHtml += `<button class="scramble-btn" onclick="selectWordG5(${index})">${word}</button>`;
-            });
+            g5Scrambled.forEach((word, index) => { bankHtml += `<button class="scramble-btn" onclick="selectWordG5(${index})">${word}</button>`; });
             document.getElementById("g5-word-bank").innerHTML = bankHtml;
-
             let answerHtml = "";
-            g5Current.forEach((word, index) => {
-                answerHtml += `<button class="scramble-btn" onclick="unselectWordG5(${index})">${word}</button>`;
-            });
+            g5Current.forEach((word, index) => { answerHtml += `<button class="scramble-btn" onclick="unselectWordG5(${index})">${word}</button>`; });
             document.getElementById("g5-answer-box").innerHTML = answerHtml;
-
-            // Auto-check when all words are placed
-            if(g5Scrambled.length === 0 && g5Original.length > 0) {
-                checkG5();
-            }
+            if(g5Scrambled.length === 0 && g5Original.length > 0) checkG5();
         }
-
-        function selectWordG5(index) {
-            if(isWaiting) return;
-            g5Current.push(g5Scrambled[index]);
-            g5Scrambled.splice(index, 1);
-            renderG5();
-        }
-
-        function unselectWordG5(index) {
-            if(isWaiting) return;
-            g5Scrambled.push(g5Current[index]);
-            g5Current.splice(index, 1);
-            renderG5();
-        }
-
+        function selectWordG5(index) { if(isWaiting) return; g5Current.push(g5Scrambled[index]); g5Scrambled.splice(index, 1); renderG5(); }
+        function unselectWordG5(index) { if(isWaiting) return; g5Scrambled.push(g5Current[index]); g5Current.splice(index, 1); renderG5(); }
         function checkG5() {
             isWaiting = true;
-            let builtSentence = g5Current.join(" ");
-            let originalSentence = g5Original.join(" ");
+            let builtSentence = g5Current.join(" "), originalSentence = g5Original.join(" ");
             let isCorrect = (builtSentence === originalSentence);
             let ansBox = document.getElementById("g5-answer-box");
 
-            if(isCorrect) {
-                ansBox.classList.add("correct-slot");
-            } else {
+            if(isCorrect) ansBox.classList.add("correct-slot");
+            else {
                 ansBox.classList.add("wrong-slot");
-                // Show the correct answer automatically
                 ansBox.innerHTML = `<span style="font-size:22px; font-weight:bold; color:white;">${originalSentence}</span>`;
             }
-            
-            handleAnswerResult(isCorrect, "game-5-board");
-            setTimeout(loadG5, 2000); // Wait 2 seconds so they can see the sentence before next round
+            handleAnswerResult(isCorrect, "game-5-board", g5TargetWord);
+            setTimeout(loadG5, 2000); 
         }
 
-        // Boot up
+        // --- CORRECTIONS BANK ---
+        function renderCorrections() {
+            let mistakesList = document.getElementById("mistakes-list");
+            let userMistakes = usersDB[currentUser].mistakes || [];
+            if (userMistakes.length === 0) {
+                mistakesList.innerHTML = `<div style="text-align:center; color:#10b981; font-size:20px; font-weight:bold; padding:30px;">🌟 You have 0 mistakes!</div>`;
+                return;
+            }
+            let html = "";
+            let combinedVocab = [...vocab_L1, ...vocab_L2];
+            userMistakes.forEach(wordStr => {
+                let wordData = combinedVocab.find(v => v.w === wordStr);
+                if (wordData) {
+                    let fullSentence = wordData.s.replace("___", `[ ${wordData.w.toUpperCase()} ]`);
+                    html += `
+                    <div class="mistake-card">
+                        <div class="mistake-word">${wordData.w}</div>
+                        <div class="mistake-mean">📖 ${wordData.m}</div>
+                        <div class="mistake-sent">💬 "${fullSentence}"</div>
+                    </div>`;
+                }
+            });
+            mistakesList.innerHTML = html;
+        }
+
+        function clearMistakes() {
+            if(confirm("Clear all your tracked mistakes?")) {
+                usersDB[currentUser].mistakes = [];
+                saveData();
+                renderCorrections();
+            }
+        }
+
+        // --- LEADERBOARD (TIME-STAMPED) ---
+        function renderLeaderboard(period) {
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            let btnMap = { 'weekly': 'lb-week', 'monthly': 'lb-month', 'overall': 'lb-all' };
+            document.getElementById(btnMap[period]).classList.add('active');
+
+            const now = new Date();
+            let startDate = 0;
+            if (period === 'weekly') {
+                startDate = new Date(); startDate.setDate(now.getDate() - 7); startDate = startDate.getTime();
+            } else if (period === 'monthly') {
+                startDate = new Date(); startDate.setDate(now.getDate() - 30); startDate = startDate.getTime();
+            }
+
+            let allPlayers = rivalPlayers.map(p => ({ name: p.name, avatar: p.avatar, calculatedXp: p.xpLog.filter(log => log.ts >= startDate || period === 'overall').reduce((sum, log) => sum + log.xp, 0), isReal: false }));
+
+            for (let user in usersDB) {
+                let userProfile = usersDB[user];
+                let periodXp = 0;
+                if (period === 'overall') {
+                    periodXp = userProfile.xpLog.reduce((acc, log) => acc + log.xp, 0);
+                } else {
+                    periodXp = userProfile.xpLog.filter(log => log.ts >= startDate).reduce((acc, log) => acc + log.xp, 0);
+                }
+                allPlayers.push({ name: user === currentUser ? `${user} (You)` : user, avatar: userProfile.avatar, calculatedXp: periodXp, isReal: user === currentUser });
+            }
+
+            allPlayers.sort((a, b) => b.calculatedXp - a.calculatedXp);
+
+            let tbody = `<tr><th>Rank</th><th>Player</th><th>${period.charAt(0).toUpperCase() + period.slice(1)} XP</th></tr>`;
+            allPlayers.forEach((p, i) => {
+                let rankDisplay = i + 1;
+                if (i === 0) rankDisplay = `<span class="rank-1">1st 🏆</span>`;
+                if (i === 1) rankDisplay = `<span class="rank-2">2nd 🥈</span>`;
+                if (i === 2) rankDisplay = `<span class="rank-3">3rd 🥉</span>`;
+                tbody += `<tr class="${p.isReal ? 'is-player' : ''}"><td>${rankDisplay}</td><td>${p.avatar} ${p.name}</td><td>${p.calculatedXp}</td></tr>`;
+            });
+            document.getElementById("leaderboard-body").innerHTML = tbody;
+        }
+
         window.onload = initApp;
     </script>
 </body>
