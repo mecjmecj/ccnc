@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSE English Arcade</title>
+    <title>DSE English Arcade v10.2</title>
     <style>
         /* --- CORE STYLES --- */
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
-        .container { max-width: 950px; margin: 0 auto; display: none; }
-        .container.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .container { max-width: 950px; margin: 0 auto; filter: blur(4px); transition: filter 0.3s; pointer-events: none; }
+        .container.active { filter: blur(0); pointer-events: auto; }
         
         /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: #1e293b; padding: 30px; border-radius: 15px; border: 2px solid #38bdf8; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(56, 189, 248, 0.4); }
         .modal-content h2 { color: #38bdf8; margin-top: 0; font-size: 28px; }
         .auth-tabs { display: flex; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #334155; }
@@ -22,11 +21,16 @@
         .input-field:focus { outline: none; border-color: #38bdf8; }
         .avatar-grid { display: flex; gap: 8px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
         .avatar-option { font-size: 30px; padding: 8px; background: #334155; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
+        .avatar-option:hover { transform: scale(1.1); }
         .avatar-option.selected { border-color: #38bdf8; background: #0f172a; box-shadow: 0 0 10px rgba(56,189,248,0.5); }
-        .start-btn { background: #10b981; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 95%; text-transform: uppercase; transition: 0.2s; margin-bottom: 10px; }
+        .start-btn { background: #10b981; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 95%; text-transform: uppercase; transition: 0.2s; }
         .start-btn:hover { background: #059669; transform: scale(1.02); }
-        .level-btn { background: #3b82f6; } .level-btn:hover { background: #2563eb; }
-        .level-2-btn { background: #f59e0b; } .level-2-btn:hover { background: #d97706; }
+        
+        .level-btn { background: #3b82f6; color: white; border: none; padding: 20px; font-size: 20px; font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; margin-bottom: 15px; transition: 0.2s; }
+        .level-btn:hover { background: #2563eb; transform: scale(1.05); }
+        .level-2-btn { background: #f59e0b; }
+        .level-2-btn:hover { background: #d97706; }
+        
         .error-msg { color: #ef4444; font-size: 14px; margin-bottom: 10px; height: 16px; font-weight: bold; }
 
         /* --- DASHBOARD HUB --- */
@@ -52,21 +56,8 @@
 
         /* --- CONTENT BOARDS --- */
         .content-board { background: #1e293b; border-radius: 15px; padding: 30px; display: none; }
-        .content-board.active { display: block; animation: boardFade 0.4s; }
-        @keyframes boardFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* 📚 FLASHCARDS STYLES */
-        .scene { width: 100%; height: 250px; perspective: 600px; margin: 20px 0; }
-        .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
-        .flashcard.is-flipped { transform: rotateY(180deg); }
-        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; text-align: center; padding: 20px; box-sizing: border-box; }
-        .flashcard-front { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); font-size: 36px; font-weight: bold; }
-        .flashcard-back { background: linear-gradient(135deg, #10b981, #059669); color: white; transform: rotateY(180deg); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
-        .fc-mean { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .fc-sent { font-size: 16px; font-style: italic; color: #d1fae5; }
-        .controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .btn:hover { background: #0ea5e9; color: white; }
+        .content-board.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         /* General Games */
         .prompt-box { font-size: 24px; text-align: center; margin-bottom: 30px; padding: 20px; background: #0f172a; border-radius: 10px; border-left: 5px solid #6366f1; }
@@ -87,7 +78,6 @@
         .mistake-card { background: #334155; padding: 15px; border-radius: 8px; border-left: 5px solid #ef4444; text-align: left; margin-bottom: 10px; }
         .mistake-word { font-size: 20px; font-weight: bold; color: #38bdf8; margin-bottom: 5px; text-transform: uppercase; }
         .mistake-mean { color: white; margin-bottom: 5px; }
-        .mistake-sent { color: #94a3b8; font-style: italic; font-size: 14px; }
         
         /* Feedbacks */
         .correct-btn, .correct-slot { background: #10b981 !important; color: white !important; border-color: #059669 !important; }
@@ -147,14 +137,13 @@
     <!-- LEVEL SELECTION MODAL -->
     <div class="modal-overlay" id="level-modal" style="display: none;">
         <div class="modal-content">
-            <h2>🎯 Choose Difficulty</h2>
+            <h2>🎯 Select Difficulty</h2>
             <p style="color: #94a3b8; margin-bottom: 25px;">Which vocabulary list do you want to train with today?</p>
-            <button class="start-btn level-btn" onclick="selectLevel(1)">Level 1 (Core DSE)</button>
-            <button class="start-btn level-2-btn" onclick="selectLevel(2)">Level 2 (Advanced)</button>
+            <button class="level-btn" onclick="selectLevel(1)">Level 1 (Core DSE)</button>
+            <button class="level-btn level-2-btn" onclick="selectLevel(2)">Level 2 (Advanced)</button>
         </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
     <div class="container" id="main-container">
         <!-- DASHBOARD HUB -->
         <div class="dashboard-header">
@@ -176,9 +165,7 @@
 
         <!-- ARCADE MENU -->
         <div class="arcade-menu">
-            <!-- FLASHCARD TAB PROMINENTLY FIRST -->
-            <button class="tab-btn active" onclick="switchTab('study')" id="tab-study" style="background:#2563eb; border-color:#3b82f6;">📚 Flashcards</button>
-            
+            <button class="tab-btn active" onclick="switchTab('study')" id="tab-study">📚 Flashcards</button>
             <div class="menu-group">
                 <div class="menu-group-label">📖 Reading</div>
                 <button class="tab-btn" onclick="switchTab('game-1')" id="tab-game-1" style="margin-top: 0;">Meaning</button>
@@ -191,27 +178,26 @@
             <button class="tab-btn" onclick="switchTab('leaderboard')" id="tab-leaderboard" style="background:#0f3460; border-color:#e94560;">🏆 Ranks</button>
         </div>
 
-        <!-- STUDY ZONE (FLASHCARDS) -->
+        <!-- GAMES -->
         <div class="content-board active" id="study-board">
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Flashcard Library</h3>
             <p style="text-align:center; color: #94a3b8;">Click the card to flip it. Study your vocabulary before you play!</p>
-            <div class="scene">
+            <div class="scene" style="height: 250px;">
                 <div class="flashcard" id="flashcard" onclick="flipCard()">
-                    <div class="flashcard-face flashcard-front" id="word-front"></div>
+                    <div class="flashcard-face flashcard-front" id="word-front" style="font-size: 36px;"></div>
                     <div class="flashcard-face flashcard-back">
-                        <div class="fc-mean" id="word-back"></div>
-                        <div class="fc-sent" id="word-sentence"></div>
+                        <div style="font-size: 24px; font-weight: bold; margin-bottom: 10px;" id="word-back"></div>
+                        <div style="font-size: 16px; font-style: italic; color: #d1fae5;" id="word-sentence"></div>
                     </div>
                 </div>
             </div>
             <div class="controls">
-                <button class="btn" onclick="prevCard()">◀ Prev</button>
-                <button class="btn" onclick="nextCard()">Next ▶</button>
+                <button class="start-btn" style="width: auto; padding: 10px 20px; margin: 0;" onclick="prevCard()">◀ Prev</button>
+                <button class="start-btn" style="width: auto; padding: 10px 20px; margin: 0;" onclick="nextCard()">Next ▶</button>
             </div>
-            <div style="text-align:center; margin-top:10px; color:#64748b; font-weight:bold;" id="card-counter"></div>
+            <div style="text-align:center; margin-top:15px; color:#64748b; font-weight:bold;" id="card-counter"></div>
         </div>
 
-        <!-- GAME 1: Meaning -->
         <div class="content-board" id="game-1-board">
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Match the Meaning</h3>
             <div class="prompt-box" id="g1-prompt"></div>
@@ -221,7 +207,6 @@
             </div>
         </div>
 
-        <!-- GAME 2: Tone -->
         <div class="content-board" id="game-2-board">
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Tone Check</h3>
             <div class="prompt-box" id="g2-prompt" style="font-size: 32px; font-weight: bold;"></div>
@@ -232,7 +217,6 @@
             </div>
         </div>
 
-        <!-- GAME 3: Context -->
         <div class="content-board" id="game-3-board">
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Contextual Blank</h3>
             <div class="prompt-box" id="g3-prompt" style="font-style: italic;"></div>
@@ -242,11 +226,10 @@
             </div>
         </div>
 
-        <!-- GAME 4: Listening -->
         <div class="content-board" id="game-4-board" style="border-color: #a855f7;">
             <h3 style="text-align:center; color:#a855f7; margin-top:0;">🎧 Listening Practice</h3>
             <div style="text-align: center; margin-bottom: 20px;">
-                <button class="start-btn" id="play-audio-btn" onclick="playAudio()" style="background:#a855f7; width: auto; font-size: 20px; padding: 10px 30px;">▶️ PLAY AUDIO</button>
+                <button class="start-btn" id="play-audio-btn" onclick="playAudio()" style="background:#a855f7; width: auto; font-size: 20px; padding: 10px 30px; margin:0;">▶️ PLAY AUDIO</button>
             </div>
             <div class="prompt-box" id="g4-prompt" style="font-style: italic; border-color: #a855f7;"></div>
             <div class="options-grid">
@@ -255,7 +238,6 @@
             </div>
         </div>
 
-        <!-- GAME 5: Writing -->
         <div class="content-board" id="game-5-board" style="border-color: #f59e0b;">
             <h3 style="text-align:center; color:#f59e0b; margin-top:0;">✍️ Writing: Syntax Builder</h3>
             <p style="text-align:center; color:#94a3b8;">Click the words to rebuild the sentence.</p>
@@ -268,7 +250,7 @@
             <h3 style="text-align:center; color:#ef4444; margin-top:0; font-size: 28px;">⚠️ Your Mistakes Bank</h3>
             <div id="mistakes-list" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;"></div>
             <div style="text-align:center; margin-top:30px;" id="clear-mistakes-container">
-                <button class="btn" style="background:#ef4444; width:auto;" onclick="clearMistakes()">Clear All Mistakes</button>
+                <button class="start-btn" style="background:#ef4444; width:auto; margin:0;" onclick="clearMistakes()">Clear All Mistakes</button>
             </div>
         </div>
 
@@ -276,9 +258,9 @@
         <div class="content-board" id="leaderboard-board" style="border-color: #e94560;">
             <h3 style="text-align:center; color:#e94560; margin-top:0; font-size: 28px;">👑 Global Rankings</h3>
             <div style="text-align:center; margin-bottom: 20px;">
-                <button class="time-btn" id="lb-week" onclick="renderLeaderboard('weekly')">This Week</button>
-                <button class="time-btn" id="lb-month" onclick="renderLeaderboard('monthly')">This Month</button>
-                <button class="time-btn active" id="lb-all" onclick="renderLeaderboard('overall')">All Time</button>
+                <button class="time-btn active" id="btn-lb-weekly" onclick="renderLeaderboard('weekly')">This Week</button>
+                <button class="time-btn" id="btn-lb-monthly" onclick="renderLeaderboard('monthly')">This Month</button>
+                <button class="time-btn" id="btn-lb-overall" onclick="renderLeaderboard('overall')">All Time</button>
             </div>
             <table class="leaderboard-table" id="leaderboard-body"></table>
         </div>
@@ -307,12 +289,7 @@
             { w: "crucial", m: "Extremely important", t: "pos", s: "It is ___ to read the question carefully." },
             { w: "dangerous", m: "Able to cause harm", t: "neg", s: "Playing with fire is extremely ___." },
             { w: "achievement", m: "A successful result", t: "pos", s: "Winning the medal is a huge ___." },
-            { w: "barrier", m: "An obstacle", t: "neg", s: "Language can be a ___ to communication." },
-            { w: "eventually", m: "In the end", t: "neu", s: "Keep trying, and you will succeed ___." },
-            { w: "frequent", m: "Happening often", t: "neu", s: "Typhoons are very ___ in summer." },
-            { w: "generate", m: "To produce or create", t: "pos", s: "Solar panels ___ clean energy." },
-            { w: "hesitate", m: "To pause before acting", t: "neg", s: "Do not ___ to ask questions." },
-            { w: "identify", m: "To recognize", t: "neu", s: "Can you ___ the man in the photo?" }
+            { w: "barrier", m: "An obstacle", t: "neg", s: "Language can be a ___ to communication." }
         ];
 
         // --- LEVEL 2 VOCABULARY (Advanced DSE) ---
@@ -336,12 +313,7 @@
             { w: "adoption", m: "Legally taking another's child", t: "pos", s: "The couple finalized the ___." },
             { w: "adult", m: "A fully grown person", t: "neu", s: "You are legally an ___ at 18." },
             { w: "advance", m: "Forward movement or progress", t: "pos", s: "There was a huge ___ in technology." },
-            { w: "advantage", m: "A condition giving success", t: "pos", s: "Height is an ___ in basketball." },
-            { w: "consequently", m: "As a result", t: "neu", s: "He didn't study; ___, he failed." },
-            { w: "furthermore", m: "In addition to what has been said", t: "neu", s: "It is cheap; ___, it is high quality." },
-            { w: "nevertheless", m: "In spite of that", t: "neu", s: "It was cold; ___, we went swimming." },
-            { w: "evaluate", m: "To judge how good or bad something is", t: "neu", s: "The teacher will ___ your speaking skills." },
-            { w: "justify", m: "To give a good reason for", t: "neu", s: "You must ___ your answer with evidence." }
+            { w: "advantage", m: "A condition giving success", t: "pos", s: "Height is an ___ in basketball." }
         ];
 
         let activeVocab = []; 
@@ -372,9 +344,9 @@
             return ghosts;
         }
 
-        // --- GLOBAL AUTH & DATABASE STATE ---
-        const DB_KEY = "dseArcadeUsersDB_vFinal"; 
-        const CURRENT_USER_KEY = "dseArcadeCurrentUser_vFinal";
+        // --- GLOBAL STATE ---
+        const DB_KEY = "dseArcadeUsersDB_v13"; 
+        const CURRENT_USER_KEY = "dseArcadeCurrentUser_v13";
         
         let usersDB = {}; 
         let currentUser = null;
@@ -386,12 +358,12 @@
 
         // --- INIT ---
         function initApp() {
-            let savedGhosts = localStorage.getItem("dseArcadeGhosts_vFinal");
+            let savedGhosts = localStorage.getItem("dseArcadeGhosts_v13");
             if (savedGhosts) {
                 rivalPlayers = JSON.parse(savedGhosts);
             } else {
                 rivalPlayers = generateGhosts();
-                localStorage.setItem("dseArcadeGhosts_vFinal", JSON.stringify(rivalPlayers));
+                localStorage.setItem("dseArcadeGhosts_v13", JSON.stringify(rivalPlayers));
             }
 
             let db = localStorage.getItem(DB_KEY);
@@ -466,8 +438,8 @@
         }
         function saveData() { if(currentUser) localStorage.setItem(DB_KEY, JSON.stringify(usersDB)); }
 
-        // --- LEVEL SELECTION & FLASHCARD SETUP ---
-        function startGameplay(level) {
+        // --- LEVEL SELECTION & FLASHCARDS ---
+        function selectLevel(level) {
             // SET THE VOCAB DECK BASED ON LEVEL
             activeVocab = (level === 1) ? vocab_L1 : vocab_L2;
             
@@ -477,9 +449,7 @@
             let lvlText = (level === 1) ? "Level 1: Core DSE" : "Level 2: Advanced";
             document.getElementById("level-display").innerText = lvlText;
             
-            // IMPORTANT: Reset flashcard index when a new level is chosen
             fIndex = 0; 
-            
             updateDashboard();
             switchTab('study'); // Load FLASHCARDS tab automatically!
         }
@@ -507,7 +477,7 @@
             if (totalXP > 1000) rank = "Silver"; if (totalXP > 2500) rank = "Gold"; if (totalXP > 4000) rank = "Diamond";
             document.getElementById("rank-display").innerText = `Rank: ${rank}`;
             
-            renderLeaderboard('overall'); 
+            renderLeaderboard('weekly'); 
         }
 
         function handleAnswerResult(isCorrect, boardId, targetWordStr = null) {
@@ -542,31 +512,28 @@
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById(`${tabId}-board`).classList.add('active');
             
-            // Trigger specific renders based on the tab chosen
-            if(tabId === 'study') showCard(); // Ensures flashcards load
+            if(tabId === 'study') showCard(); 
             if(tabId === 'game-1') loadG1();
             if(tabId === 'game-2') loadG2();
             if(tabId === 'game-3') loadG3();
             if(tabId === 'game-4') loadG4();
             if(tabId === 'game-5') loadG5();
             if(tabId === 'corrections') renderCorrections();
-            if(tabId === 'leaderboard') renderLeaderboard('overall');
+            if(tabId === 'leaderboard') renderLeaderboard('weekly');
         }
 
         // --- 📚 FLASHCARD LOGIC ---
         const flashcardEl = document.getElementById('flashcard');
         function flipCard() { flashcardEl.classList.toggle('is-flipped'); }
         function showCard() {
-            // Load the current word from activeVocab onto the flashcard
             document.getElementById('word-front').innerText = activeVocab[fIndex].w;
             document.getElementById('word-back').innerText = "📖 " + activeVocab[fIndex].m;
-            document.getElementById('word-sentence').innerText = `"${activeVocab[fIndex].s.replace("___", `[ ${activeVocab[fIndex].w} ]`)}"`;
+            document.getElementById('word-sentence').innerText = `"${activeVocab[fIndex].s.replace("___", `[ ${activeVocab[fIndex].w.toUpperCase()} ]`)}"`;
             document.getElementById('card-counter').innerText = `Card ${fIndex + 1} of ${activeVocab.length}`;
             if(flashcardEl.classList.contains('is-flipped')) flipCard();
         }
         function nextCard() { fIndex = (fIndex + 1) % activeVocab.length; showCard(); }
         function prevCard() { fIndex = (fIndex - 1 + activeVocab.length) % activeVocab.length; showCard(); }
-
 
         // --- GAME 1: Meaning ---
         let g1Target, g1Options;
@@ -686,7 +653,7 @@
             setTimeout(loadG4, 1500);
         }
 
-        // --- GAME 5: Writing (Syntax Builder) ---
+        // --- GAME 5: Syntax Builder (Writing) ---
         let g5Original = [], g5Scrambled = [], g5Current = [], g5TargetWord = "";
         function loadG5() {
             isWaiting = false;
@@ -721,7 +688,7 @@
                 ansBox.classList.add("wrong-slot");
                 ansBox.innerHTML = `<span style="font-size:22px; font-weight:bold; color:white;">${originalSentence}</span>`;
             }
-            handleAnswerResult(isCorrect, "game-5-board", g5TargetWord);
+            handleAnswerResult(isCorrect, "game-5-board", g5TargetWord); 
             setTimeout(loadG5, 2000); 
         }
 
@@ -729,10 +696,14 @@
         function renderCorrections() {
             let mistakesList = document.getElementById("mistakes-list");
             let userMistakes = usersDB[currentUser].mistakes || [];
+
             if (userMistakes.length === 0) {
-                mistakesList.innerHTML = `<div style="text-align:center; color:#10b981; font-size:20px; font-weight:bold; padding:30px;">🌟 You have 0 mistakes!</div>`;
+                mistakesList.innerHTML = `<div style="text-align:center; color:#10b981; font-size:20px; font-weight:bold; padding:30px;">🌟 Incredible! You have 0 mistakes to review. Keep it up!</div>`;
+                document.getElementById("clear-mistakes-container").style.display = "none";
                 return;
             }
+
+            document.getElementById("clear-mistakes-container").style.display = "block";
             let html = "";
             let combinedVocab = [...vocab_L1, ...vocab_L2];
             userMistakes.forEach(wordStr => {
@@ -751,17 +722,17 @@
         }
 
         function clearMistakes() {
-            if(confirm("Clear all your tracked mistakes?")) {
+            if(confirm("Are you sure you want to clear all your tracked mistakes?")) {
                 usersDB[currentUser].mistakes = [];
                 saveData();
                 renderCorrections();
             }
         }
 
-        // --- LEADERBOARD (TIME-STAMPED) ---
+        // --- TIME-STAMPED LEADERBOARD ---
         function renderLeaderboard(period) {
             document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
-            let btnMap = { 'weekly': 'lb-week', 'monthly': 'lb-month', 'overall': 'lb-all' };
+            let btnMap = { 'weekly': 'btn-lb-weekly', 'monthly': 'btn-lb-monthly', 'overall': 'btn-lb-overall' };
             document.getElementById(btnMap[period]).classList.add('active');
 
             const now = new Date();
@@ -772,7 +743,12 @@
                 startDate = new Date(); startDate.setDate(now.getDate() - 30); startDate = startDate.getTime();
             }
 
-            let allPlayers = rivalPlayers.map(p => ({ name: p.name, avatar: p.avatar, calculatedXp: p.xpLog.filter(log => log.ts >= startDate || period === 'overall').reduce((sum, log) => sum + log.xp, 0), isReal: false }));
+            let allPlayers = rivalPlayers.map(p => ({ 
+                name: p.name, 
+                avatar: p.avatar, 
+                calculatedXp: p.xpLog.filter(log => log.ts >= startDate || period === 'overall').reduce((sum, log) => sum + log.xp, 0), 
+                isReal: false 
+            }));
 
             for (let user in usersDB) {
                 let userProfile = usersDB[user];
