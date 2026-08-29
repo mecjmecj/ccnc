@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSE English Arcade v11</title>
+    <title>DSE English Arcade v12</title>
     <style>
         /* --- CORE STYLES --- */
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
@@ -51,27 +51,29 @@
         .menu-group-label { position: absolute; top: -10px; left: 15px; background: #0f172a; padding: 0 8px; font-size: 11px; font-weight: bold; color: #818cf8; text-transform: uppercase; }
 
         /* --- CONTENT BOARDS --- */
-        .content-board { background: #1e293b; border-radius: 15px; padding: 30px; display: none; }
+        .content-board { background: #1e293b; border-radius: 15px; padding: 30px; display: none; position: relative; }
         .content-board.active { display: block; animation: boardFade 0.4s; }
         @keyframes boardFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
+        .progress-tracker { position: absolute; top: 15px; right: 20px; background: #334155; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #38bdf8; border: 1px solid #475569; }
+
         /* 📚 FLASHCARDS STYLES */
         .scene { width: 100%; height: 260px; perspective: 600px; margin: 20px 0; }
         .flashcard { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
         .flashcard.is-flipped { transform: rotateY(180deg); }
         .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; text-align: center; padding: 20px; box-sizing: border-box; }
-        .flashcard-front { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); font-size: 42px; font-weight: bold; text-transform: uppercase; }
+        
+        /* FIX: text-transform capitalize ensures only the first letter is capitalized */
+        .flashcard-front { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3); font-size: 42px; font-weight: bold; text-transform: capitalize; }
+        
         .flashcard-back { background: linear-gradient(135deg, #10b981, #059669); color: white; transform: rotateY(180deg); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
         .fc-mean { font-size: 24px; font-weight: bold; margin-bottom: 15px; }
         .fc-sent { font-size: 18px; font-style: italic; color: #d1fae5; }
-        .controls { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .btn:hover { background: #0ea5e9; color: white; }
         
         /* Games */
-        .prompt-box { font-size: 24px; text-align: center; margin-bottom: 30px; padding: 20px; background: #0f172a; border-radius: 10px; border-left: 5px solid #6366f1; }
+        .prompt-box { font-size: 24px; text-align: center; margin-bottom: 30px; padding: 20px; background: #0f172a; border-radius: 10px; border-left: 5px solid #6366f1; margin-top: 15px;}
         .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .option-btn { background: #334155; color: white; border: 2px solid transparent; padding: 20px; font-size: 20px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .option-btn { background: #334155; color: white; border: 2px solid transparent; padding: 20px; font-size: 20px; font-weight: bold; border-radius: 10px; cursor: pointer; transition: 0.2s; text-transform: capitalize; }
         .option-btn:hover { background: #475569; border-color: #38bdf8; transform: translateY(-3px); }
         .vibe-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .vibe-btn-pos { background: #064e3b; border: 2px solid #10b981; }
@@ -81,14 +83,8 @@
         /* Sentence Builder */
         .scramble-btn { background: #475569; color: white; border: 2px solid #64748b; padding: 12px 20px; font-size: 20px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .scramble-btn:hover { background: #64748b; border-color: #f59e0b; transform: translateY(-2px); }
-        .answer-slot { background: #0f172a; border: 2px dashed #f59e0b; min-height: 60px; border-radius: 10px; padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 20px; }
+        .answer-slot { background: #0f172a; border: 2px dashed #f59e0b; min-height: 60px; border-radius: 10px; padding: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; margin-bottom: 20px; margin-top: 20px;}
 
-        /* Mistakes */
-        .mistake-card { background: #334155; padding: 15px; border-radius: 8px; border-left: 5px solid #ef4444; text-align: left; margin-bottom: 10px; }
-        .mistake-word { font-size: 20px; font-weight: bold; color: #38bdf8; margin-bottom: 5px; text-transform: uppercase; }
-        .mistake-mean { color: white; margin-bottom: 5px; }
-        .mistake-sent { color: #94a3b8; font-style: italic; font-size: 14px; }
-        
         /* Feedbacks */
         .correct-btn, .correct-slot { background: #10b981 !important; color: white !important; border-color: #059669 !important; }
         .wrong-btn, .wrong-slot { background: #ef4444 !important; color: white !important; border-color: #b91c1c !important; opacity: 0.8; }
@@ -116,11 +112,13 @@
                 <div class="auth-tab" id="tab-register" onclick="switchAuthMode('register')">REGISTER</div>
             </div>
             <div class="error-msg" id="auth-error"></div>
+
             <div id="view-login">
                 <input type="text" id="login-username" class="input-field" placeholder="Username" maxlength="12">
                 <input type="password" id="login-password" class="input-field" placeholder="Password">
                 <button class="start-btn" onclick="processLogin()">Enter Arcade 🚀</button>
             </div>
+
             <div id="view-register" style="display: none;">
                 <input type="text" id="reg-username" class="input-field" placeholder="Choose a Username" maxlength="12">
                 <input type="password" id="reg-password" class="input-field" placeholder="Create a Password">
@@ -142,7 +140,7 @@
     <div class="modal-overlay" id="level-modal" style="display: none;">
         <div class="modal-content">
             <h2>🎯 Select Difficulty</h2>
-            <p style="color: #94a3b8; margin-bottom: 25px;">Which vocabulary list do you want to train with today?</p>
+            <p style="color: #94a3b8; margin-bottom: 25px;">Each level contains 100 unique questions.</p>
             <button class="start-btn level-btn" onclick="selectLevel(1)">Level 1 (Core DSE)</button>
             <button class="start-btn level-2-btn" onclick="selectLevel(2)">Level 2 (Advanced)</button>
         </div>
@@ -171,12 +169,14 @@
         <!-- ARCADE MENU -->
         <div class="arcade-menu">
             <button class="tab-btn active" onclick="switchTab('study')" id="tab-study" style="background:#2563eb; border-color:#3b82f6;">📚 Flashcards</button>
+            
             <div class="menu-group">
                 <div class="menu-group-label">📖 Reading</div>
                 <button class="tab-btn" onclick="switchTab('game-1')" id="tab-game-1" style="margin-top: 0;">Meaning</button>
                 <button class="tab-btn" onclick="switchTab('game-2')" id="tab-game-2" style="margin-top: 0;">Tone</button>
                 <button class="tab-btn" onclick="switchTab('game-3')" id="tab-game-3" style="margin-top: 0;">Context</button>
             </div>
+            
             <button class="tab-btn" onclick="switchTab('game-4')" id="tab-game-4" style="border-color: #a855f7;">🎧 Listening</button>
             <button class="tab-btn" onclick="switchTab('game-5')" id="tab-game-5" style="border-color: #f59e0b;">✍️ Writing</button>
             <button class="tab-btn" onclick="switchTab('corrections')" id="tab-corrections" style="border-color: #ef4444; color: #fca5a5;">⚠️ Mistakes</button>
@@ -185,13 +185,14 @@
 
         <!-- STUDY ZONE (FLASHCARDS) -->
         <div class="content-board active" id="study-board">
+            <div class="progress-tracker" id="study-progress">Card 1 of 100</div>
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Flashcard Library</h3>
             <p style="text-align:center; color: #94a3b8;">Study your vocabulary before you play! No repeats.</p>
             <div class="scene">
                 <div class="flashcard" id="flashcard" onclick="flipCard()">
                     <div class="flashcard-face flashcard-front">
                         <div id="word-front"></div>
-                        <div style="font-size:14px; font-weight:normal; margin-top:20px; opacity:0.7;">👆 Click to flip</div>
+                        <div style="font-size:14px; font-weight:normal; margin-top:20px; opacity:0.7; text-transform:none;">👆 Click to flip</div>
                     </div>
                     <div class="flashcard-face flashcard-back">
                         <div class="fc-mean" id="word-back"></div>
@@ -202,11 +203,11 @@
             <div class="controls">
                 <button class="start-btn" style="width: auto; padding: 10px 20px; margin: 0;" onclick="nextCard()">Next Card ▶</button>
             </div>
-            <div style="text-align:center; margin-top:15px; color:#64748b; font-weight:bold;" id="card-counter"></div>
         </div>
 
-        <!-- GAMES 1-5 & OTHERS ... -->
+        <!-- GAME 1: Meaning -->
         <div class="content-board" id="game-1-board">
+            <div class="progress-tracker" id="g1-progress">Q 1 of 100</div>
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Match the Meaning</h3>
             <div class="prompt-box" id="g1-prompt"></div>
             <div class="options-grid">
@@ -214,16 +215,22 @@
                 <button class="option-btn" id="g1-opt-2" onclick="checkG1(2)"></button> <button class="option-btn" id="g1-opt-3" onclick="checkG1(3)"></button>
             </div>
         </div>
+
+        <!-- GAME 2: Tone -->
         <div class="content-board" id="game-2-board">
+            <div class="progress-tracker" id="g2-progress">Q 1 of 100</div>
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Tone Check</h3>
-            <div class="prompt-box" id="g2-prompt" style="font-size: 32px; font-weight: bold;"></div>
+            <div class="prompt-box" id="g2-prompt" style="font-size: 32px; font-weight: bold; text-transform: capitalize;"></div>
             <div class="vibe-grid">
                 <button class="option-btn vibe-btn-pos" onclick="checkG2('pos')">😊 Positive</button>
                 <button class="option-btn vibe-btn-neu" onclick="checkG2('neu')">😐 Neutral</button>
                 <button class="option-btn vibe-btn-neg" onclick="checkG2('neg')">😡 Negative</button>
             </div>
         </div>
+
+        <!-- GAME 3: Context -->
         <div class="content-board" id="game-3-board">
+            <div class="progress-tracker" id="g3-progress">Q 1 of 100</div>
             <h3 style="text-align:center; color:#38bdf8; margin-top:0;">Reading: Contextual Blank</h3>
             <div class="prompt-box" id="g3-prompt" style="font-style: italic;"></div>
             <div class="options-grid">
@@ -231,7 +238,10 @@
                 <button class="option-btn" id="g3-opt-2" onclick="checkG3(2)"></button> <button class="option-btn" id="g3-opt-3" onclick="checkG3(3)"></button>
             </div>
         </div>
+
+        <!-- GAME 4: Listening -->
         <div class="content-board" id="game-4-board" style="border-color: #a855f7;">
+            <div class="progress-tracker" id="g4-progress" style="color: #a855f7; border-color:#a855f7;">Q 1 of 100</div>
             <h3 style="text-align:center; color:#a855f7; margin-top:0;">🎧 Listening Practice</h3>
             <div style="text-align: center; margin-bottom: 20px;">
                 <button class="start-btn" id="play-audio-btn" onclick="playAudio()" style="background:#a855f7; width: auto; font-size: 20px; padding: 10px 30px; margin:0;">▶️ PLAY AUDIO</button>
@@ -242,12 +252,17 @@
                 <button class="option-btn" id="g4-opt-2" onclick="checkG4(2)"></button> <button class="option-btn" id="g4-opt-3" onclick="checkG4(3)"></button>
             </div>
         </div>
+
+        <!-- GAME 5: Writing -->
         <div class="content-board" id="game-5-board" style="border-color: #f59e0b;">
+            <div class="progress-tracker" id="g5-progress" style="color: #f59e0b; border-color:#f59e0b;">Q 1 of 100</div>
             <h3 style="text-align:center; color:#f59e0b; margin-top:0;">✍️ Writing: Syntax Builder</h3>
             <p style="text-align:center; color:#94a3b8;">Click the words to rebuild the sentence.</p>
             <div class="answer-slot" id="g5-answer-box"></div>
             <div id="g5-word-bank" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px;"></div>
         </div>
+
+        <!-- CORRECTIONS -->
         <div class="content-board" id="corrections-board" style="border-color: #ef4444;">
             <h3 style="text-align:center; color:#ef4444; margin-top:0; font-size: 28px;">⚠️ Your Mistakes Bank</h3>
             <div id="mistakes-list" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;"></div>
@@ -255,6 +270,8 @@
                 <button class="start-btn" style="background:#ef4444; width:auto; margin:0;" onclick="clearMistakes()">Clear All Mistakes</button>
             </div>
         </div>
+
+        <!-- LEADERBOARD -->
         <div class="content-board" id="leaderboard-board" style="border-color: #e94560;">
             <h3 style="text-align:center; color:#e94560; margin-top:0; font-size: 28px;">👑 Global Rankings</h3>
             <div style="text-align:center; margin-bottom: 20px;">
@@ -268,207 +285,151 @@
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- MASSIVE COMPACT DATABASE (150 Words Total: 75 Core, 75 Advanced) ---
-        // Packed efficiently as strings to guarantee it doesn't get cut off!
-        // Format: "word|Meaning|tone|Sentence with ___"
+        // --- 100 WORDS FOR LEVEL 1 & 100 WORDS FOR LEVEL 2 (200 TOTAL) ---
         const RAW_L1 = [
-            "abandon|To leave behind completely|neg|They had to ___ the sinking ship.",
-            "abolish|To officially end a law|neu|The government should ___ the unfair rule.",
-            "absorb|To take in liquid or knowledge|neu|Sponges easily ___ spilled water.",
-            "accelerate|To speed up|pos|Press the pedal to ___ the car.",
-            "accommodate|To provide space for|pos|The hotel can ___ 500 guests.",
-            "accomplish|To achieve successfully|pos|You will ___ great things with hard work.",
-            "accumulate|To gather over time|neu|Dust will ___ if you don't clean.",
-            "accuse|To say someone did wrong|neg|Do not ___ him without solid proof.",
-            "adapt|To adjust to new conditions|pos|Animals must ___ to survive winter.",
-            "address|To deal with an issue|neu|We must ___ the problem of pollution.",
-            "admit|To confess|neu|He had to ___ that he made a mistake.",
-            "adopt|To take up a new idea|pos|The school will ___ a new teaching method.",
-            "advance|To move forward|pos|Technology continues to ___ rapidly.",
-            "advocate|To publicly support|pos|Many students ___ for healthier lunches.",
-            "alleviate|To make pain less severe|pos|Medicine will help ___ your headache.",
-            "alter|To change slightly|neu|You can ___ the settings in the menu.",
-            "analyze|To examine in detail|neu|Scientists will ___ the data carefully.",
-            "anticipate|To expect to happen|neu|We ___ a large crowd at the concert.",
-            "apologize|To say sorry|pos|You should ___ for being late.",
-            "appeal|To be attractive|pos|The new phone will ___ to teenagers.",
-            "approach|To move towards|neu|Slow down as you ___ the corner.",
-            "approve|To officially agree|pos|The principal must ___ the event.",
-            "argue|To disagree angrily|neg|Brothers often ___ over silly things.",
-            "assemble|To gather together|neu|Students will ___ in the school hall.",
-            "assess|To judge value or quality|neu|The teacher will ___ your speaking skills.",
-            "assign|To give a task|neu|The boss will ___ the project to John.",
-            "assist|To help|pos|Please ___ the elderly crossing the street.",
-            "assume|To believe without proof|neg|Do not ___ things you don't know.",
-            "attempt|To try|neu|He will ___ to break the world record.",
-            "attract|To draw interest|pos|Flowers ___ bees with bright colors.",
-            "avoid|To keep away from|neu|You should ___ eating too much sugar.",
-            "ban|To legally forbid|neg|The city will ___ plastic bags next year.",
-            "benefit|To gain an advantage|pos|Exercise will greatly ___ your health.",
-            "blame|To hold responsible for bad things|neg|Do not ___ others for your mistakes.",
-            "boost|To increase or improve|pos|Coffee can ___ your energy levels.",
-            "calculate|To figure out using math|neu|Use a calculator to ___ the total cost.",
-            "capture|To catch or record|neu|Use a camera to ___ the beautiful sunset.",
-            "celebrate|To enjoy a happy event|pos|We will ___ her birthday tomorrow.",
-            "challenge|To invite to a contest|neu|I ___ you to a game of chess.",
-            "clarify|To make clear|pos|Please ___ what you mean by that statement.",
-            "collaborate|To work together|pos|The two schools will ___ on the project.",
-            "combat|To fight against|pos|We must ___ global warming immediately.",
-            "combine|To join together|neu|You must ___ the ingredients in a bowl.",
-            "commit|To promise to do something|pos|You must ___ to studying every day.",
-            "communicate|To share information|pos|Humans ___ using language and gestures.",
-            "compare|To look for differences|neu|Let us ___ the prices of the two phones.",
-            "compel|To force someone to do something|neg|The rain will ___ us to stay indoors.",
-            "compensate|To pay for a loss|neu|The company will ___ you for the damage.",
-            "compete|To try to win against others|neu|Many athletes will ___ in the Olympics.",
-            "complain|To say you are unhappy|neg|Customers will ___ if the food is cold.",
-            "abundant|More than enough|pos|The farm had an ___ harvest of apples.",
-            "accurate|Exactly correct|pos|Make sure your answers are ___.",
-            "active|Moving around a lot|pos|Children need to be energetic and ___.",
-            "adequate|Enough for a purpose|pos|Make sure you drink an ___ amount of water.",
-            "adverse|Harmful or negative|neg|Smoking has an ___ effect on your lungs.",
-            "aggressive|Ready to attack|neg|The angry dog became very ___.",
-            "alternative|Another choice|neu|We need to find an ___ route home.",
-            "ambiguous|Having multiple meanings|neg|The instructions were confusing and ___.",
-            "ambitious|Strong desire to succeed|pos|The ___ student wants to be a doctor.",
-            "ancient|Very old|neu|We visited an ___ temple in Japan.",
-            "anonymous|Unknown name|neu|The donation was made by an ___ person.",
-            "apparent|Clearly visible|neu|It became ___ that he was lying.",
-            "appealing|Attractive|pos|The new video game looks very ___.",
-            "appropriate|Suitable for the situation|pos|Wear clothes that are ___ for a wedding.",
-            "artificial|Fake; human-made|neu|This candy contains ___ flavors.",
-            "authentic|Genuine and real|pos|We ate ___ Italian food in Tokyo.",
-            "awful|Very bad|neg|The rotten egg smelled absolutely ___.",
-            "basic|Simple and essential|neu|You must learn the ___ rules first.",
-            "beneficial|Helpful and good|pos|Eating vegetables is ___ to your health.",
-            "bitter|Angry or sharp tasting|neg|Black coffee has a very ___ taste.",
-            "brilliant|Very smart or bright|pos|Albert Einstein was a ___ scientist.",
-            "cautious|Careful to avoid danger|neu|Be ___ when crossing the busy street.",
-            "chronic|Lasting a long time|neg|My grandfather suffers from ___ back pain.",
-            "classic|Typical of its kind|pos|Romeo and Juliet is a ___ love story.",
-            "clear|Easy to understand|pos|The teacher gave very ___ instructions."
+            "abandon|To leave behind completely|neg|They had to ___ the sinking ship.", "abolish|To officially end a law|neu|The government should ___ the unfair rule.",
+            "absorb|To take in liquid or knowledge|neu|Sponges easily ___ spilled water.", "accelerate|To speed up|pos|Press the pedal to ___ the car.",
+            "accommodate|To provide space for|pos|The hotel can ___ 500 guests.", "accomplish|To achieve successfully|pos|You will ___ great things with hard work.",
+            "accumulate|To gather over time|neu|Dust will ___ if you don't clean.", "accuse|To say someone did wrong|neg|Do not ___ him without solid proof.",
+            "adapt|To adjust to new conditions|pos|Animals must ___ to survive winter.", "address|To deal with an issue|neu|We must ___ the problem of pollution.",
+            "admit|To confess|neu|He had to ___ that he made a mistake.", "adopt|To take up a new idea|pos|The school will ___ a new teaching method.",
+            "advance|To move forward|pos|Technology continues to ___ rapidly.", "advocate|To publicly support|pos|Many students ___ for healthier lunches.",
+            "alleviate|To make pain less severe|pos|Medicine will help ___ your headache.", "alter|To change slightly|neu|You can ___ the settings in the menu.",
+            "analyze|To examine in detail|neu|Scientists will ___ the data carefully.", "anticipate|To expect to happen|neu|We ___ a large crowd at the concert.",
+            "apologize|To say sorry|pos|You should ___ for being late.", "appeal|To be attractive|pos|The new phone will ___ to teenagers.",
+            "approach|To move towards|neu|Slow down as you ___ the corner.", "approve|To officially agree|pos|The principal must ___ the event.",
+            "argue|To disagree angrily|neg|Brothers often ___ over silly things.", "assemble|To gather together|neu|Students will ___ in the school hall.",
+            "assess|To judge value or quality|neu|The teacher will ___ your speaking skills.", "assign|To give a task|neu|The boss will ___ the project to John.",
+            "assist|To help|pos|Please ___ the elderly crossing the street.", "assume|To believe without proof|neg|Do not ___ things you don't know.",
+            "attempt|To try|neu|He will ___ to break the world record.", "attract|To draw interest|pos|Flowers ___ bees with bright colors.",
+            "avoid|To keep away from|neu|You should ___ eating too much sugar.", "ban|To legally forbid|neg|The city will ___ plastic bags next year.",
+            "benefit|To gain an advantage|pos|Exercise will greatly ___ your health.", "blame|To hold responsible for bad things|neg|Do not ___ others for your mistakes.",
+            "boost|To increase or improve|pos|Coffee can ___ your energy levels.", "calculate|To figure out using math|neu|Use a calculator to ___ the total cost.",
+            "capture|To catch or record|neu|Use a camera to ___ the beautiful sunset.", "celebrate|To enjoy a happy event|pos|We will ___ her birthday tomorrow.",
+            "challenge|To invite to a contest|neu|I ___ you to a game of chess.", "clarify|To make clear|pos|Please ___ what you mean by that statement.",
+            "collaborate|To work together|pos|The two schools will ___ on the project.", "combat|To fight against|pos|We must ___ global warming immediately.",
+            "combine|To join together|neu|You must ___ the ingredients in a bowl.", "commit|To promise to do something|pos|You must ___ to studying every day.",
+            "communicate|To share information|pos|Humans ___ using language and gestures.", "compare|To look for differences|neu|Let us ___ the prices of the two phones.",
+            "compel|To force someone to do something|neg|The rain will ___ us to stay indoors.", "compensate|To pay for a loss|neu|The company will ___ you for the damage.",
+            "compete|To try to win against others|neu|Many athletes will ___ in the Olympics.", "complain|To say you are unhappy|neg|Customers will ___ if the food is cold.",
+            "abundant|More than enough|pos|The farm had an ___ harvest of apples.", "accurate|Exactly correct|pos|Make sure your answers are ___.",
+            "active|Moving around a lot|pos|Children need to be energetic and ___.", "adequate|Enough for a purpose|pos|Make sure you drink an ___ amount of water.",
+            "adverse|Harmful or negative|neg|Smoking has an ___ effect on your lungs.", "aggressive|Ready to attack|neg|The angry dog became very ___.",
+            "alternative|Another choice|neu|We need to find an ___ route home.", "ambiguous|Having multiple meanings|neg|The instructions were confusing and ___.",
+            "ambitious|Strong desire to succeed|pos|The ___ student wants to be a doctor.", "ancient|Very old|neu|We visited an ___ temple in Japan.",
+            "anonymous|Unknown name|neu|The donation was made by an ___ person.", "apparent|Clearly visible|neu|It became ___ that he was lying.",
+            "appealing|Attractive|pos|The new video game looks very ___.", "appropriate|Suitable for the situation|pos|Wear clothes that are ___ for a wedding.",
+            "artificial|Fake; human-made|neu|This candy contains ___ flavors.", "authentic|Genuine and real|pos|We ate ___ Italian food in Tokyo.",
+            "awful|Very bad|neg|The rotten egg smelled absolutely ___.", "basic|Simple and essential|neu|You must learn the ___ rules first.",
+            "beneficial|Helpful and good|pos|Eating vegetables is ___ to your health.", "bitter|Angry or sharp tasting|neg|Black coffee has a very ___ taste.",
+            "brilliant|Very smart or bright|pos|Albert Einstein was a ___ scientist.", "cautious|Careful to avoid danger|neu|Be ___ when crossing the busy street.",
+            "chronic|Lasting a long time|neg|My grandfather suffers from ___ back pain.", "classic|Typical of its kind|pos|Romeo and Juliet is a ___ love story.",
+            "clear|Easy to understand|pos|The teacher gave very ___ instructions.", "complex|Having many parts|neu|The human brain is a ___ organ.",
+            "comprehensive|Complete and thorough|pos|The report provided a ___ summary.", "confident|Sure of oneself|pos|She felt very ___ before the exam.",
+            "confused|Unable to think clearly|neg|The difficult math problem left me ___.", "conscious|Aware of surroundings|neu|The patient was awake and fully ___.",
+            "consistent|Unchanging over time|pos|You must practice to see ___ results.", "constant|Occurring continuously|neu|The machine made a ___ humming noise.",
+            "controversial|Causing disagreement|neg|The new school rule was highly ___.", "conventional|Traditional and standard|neu|He prefers a ___ approach to teaching.",
+            "creative|Having great imagination|pos|Artists are usually very ___ people.", "critical|Expressing disapproval|neg|The boss was very ___ of the bad work.",
+            "crucial|Extremely important|pos|It is ___ to read the question carefully.", "curious|Eager to learn|pos|Cats are very ___ animals.",
+            "dangerous|Able to cause harm|neg|Playing with fire is extremely ___.", "delicate|Easily broken|neu|The glass vase is very ___.",
+            "ability|Skill to do something|pos|Birds have the ___ to fly.", "absence|Being away|neg|His ___ from class was noticed.",
+            "access|Means of approaching|pos|Students have free ___ to the library.", "accident|Unexpected bad event|neg|He broke his arm in a car ___.",
+            "achievement|A successful result|pos|Winning the gold medal is a huge ___.", "advantage|A favorable situation|pos|Being tall is a big ___ in basketball.",
+            "analysis|Detailed examination|neu|The scientist conducted a deep data ___.", "anxiety|A feeling of worry|neg|Exams often cause a lot of ___.",
+            "aspect|A particular feature|neu|Grammar is an important ___ of English.", "assessment|Evaluation of something|neu|The teacher gave us a speaking ___.",
+            "attitude|Way of thinking|neu|She always has a positive ___ towards learning.", "barrier|An obstacle|neg|Language can be a ___ to communication.",
+            "bias|Unfair prejudice|neg|A judge must not show any ___.", "burden|A heavy load|neg|Homework should not be a heavy ___.",
+            "capacity|Maximum amount|neu|The stadium has a ___ of 50,000 people.", "category|A class or group|neu|Apples belong in the fruit ___.",
+            "characteristic|A typical feature|neu|A key ___ of mammals is having hair.", "circumstance|Fact related to an event|neu|I cannot help you under this ___.",
+            "combination|Joining different parts|neu|Pink is a ___ of red and white.", "community|Group living together|pos|We must help the poor in our ___."
         ];
 
         const RAW_L2 = [
-            "abundance|A very large quantity|pos|There is an ___ of food at the buffet.",
-            "abuse|To use improperly or harmfully|neg|Leaders should not ___ their power.",
-            "access|The right to enter or use|neu|Students have free ___ to the library.",
-            "accident|An unfortunate incident|neg|He was injured in a car ___.",
-            "accommodation|A place to live or stay|neu|The hotel provides excellent ___.",
-            "accompany|To go somewhere with someone|neu|I will ___ you to the hospital.",
-            "account|A record or report|neu|He gave a detailed ___ of the event.",
-            "accuracy|The state of being exact|pos|Check your math for ___.",
-            "accustomed|Familiar with something|neu|I am not ___ to waking up so early.",
-            "acknowledge|To accept or admit truth|pos|You must ___ your mistakes to grow.",
-            "acquire|To get or buy something|pos|The museum will ___ a new painting.",
-            "activity|A thing that a person does|neu|Running is a healthy physical ___.",
-            "addiction|Cannot stop doing something harmful|neg|He sought help for his gambling ___.",
-            "addition|The action of adding|neu|The new gym is a great ___ to the school.",
-            "administration|Management of a business|neu|The hospital ___ changed the rules.",
-            "adolescence|Period between childhood and adult|neu|Teenagers go through ___.",
-            "adoption|Legally taking another's child|pos|The couple finalized the ___.",
-            "adult|A fully grown person|neu|You are legally an ___ at 18.",
-            "advance|Forward movement or progress|pos|There was a huge ___ in technology.",
-            "advantage|A condition giving success|pos|Height is an ___ in basketball.",
-            "ability|Skill to do something|pos|Birds have the ___ to fly.",
-            "absence|Being away|neg|His ___ from class was noticed.",
-            "achievement|A successful result|pos|Winning the gold medal is a huge ___.",
-            "analysis|Detailed examination|neu|The scientist conducted a deep data ___.",
-            "anxiety|A feeling of worry|neg|Exams often cause a lot of ___.",
-            "aspect|A particular feature|neu|Grammar is an important ___ of English.",
-            "assessment|Evaluation of something|neu|The teacher gave us a speaking ___.",
-            "assumption|Accepted as true without proof|neg|You made a false ___ about me.",
-            "attitude|Way of thinking|neu|She always has a positive ___ towards learning.",
-            "authority|Power to give orders|neu|The police have the ___ to arrest people.",
-            "barrier|An obstacle|neg|Language can be a ___ to communication.",
-            "bias|Unfair prejudice|neg|A judge must not show any ___.",
-            "burden|A heavy load|neg|Homework should not be a heavy ___.",
-            "capacity|Maximum amount|neu|The stadium has a ___ of 50,000 people.",
-            "category|A class or group|neu|Apples belong in the fruit ___.",
-            "characteristic|A typical feature|neu|A key ___ of mammals is having hair.",
-            "circumstance|Fact related to an event|neu|I cannot help you under this ___.",
-            "colleague|A person you work with|neu|My father is having dinner with a ___.",
-            "combination|Joining different parts|neu|Pink is a ___ of red and white.",
-            "community|Group living together|pos|We must help the poor in our ___.",
-            "component|A part of a whole|neu|The battery is a key ___ of the phone.",
-            "concept|An abstract idea|neu|Time travel is an interesting ___.",
-            "conclusion|The end result|neu|What is your final ___ on this matter?",
-            "conflict|A serious disagreement|neg|There is a ___ between the two countries.",
-            "consensus|A general agreement|pos|The group finally reached a ___.",
-            "consequence|A result or effect|neg|Failing is the ___ of not studying.",
-            "contribution|A gift or payment|pos|He made a great ___ to science.",
-            "controversy|Public disagreement|neg|The new law caused a lot of ___.",
-            "crisis|A time of great difficulty|neg|The city faced a financial ___.",
-            "debate|A formal discussion|neu|The students had a ___ about school rules.",
-            "accordingly|Therefore|neu|He was sick; ___, he stayed home.",
-            "accurately|Correctly and precisely|pos|Please answer the questions ___.",
-            "actually|As the truth or facts|neu|I thought it was a dog, but it was ___ a wolf.",
-            "additionally|As an extra factor|neu|The phone is cheap; ___, it is very fast.",
-            "alternatively|As another option|neu|We can walk; ___, we can take a bus.",
-            "although|In spite of the fact that|neu|___ it was raining, we played football.",
-            "always|At all times|neu|You must ___ wear a seatbelt in a car.",
-            "apparently|As far as one can see|neu|___, the test has been canceled.",
-            "approximately|Roughly; around|neu|The journey will take ___ two hours.",
-            "automatically|Without human control|neu|The doors open ___ when you approach.",
-            "barely|Only just; almost not|neg|The music was so quiet I could ___ hear it.",
-            "basically|Fundamentally|neu|The two phones are ___ the same.",
-            "briefly|For a short time|neu|Let me explain the rules very ___.",
-            "carefully|With great attention|pos|You must read the instructions ___.",
-            "certainly|Without a doubt|pos|I will ___ help you with your homework.",
-            "clearly|Easy to see|pos|You must speak loudly and ___.",
-            "closely|With careful attention|neu|Watch the magician's hands very ___.",
-            "commonly|Very often|neu|English is ___ spoken around the world.",
-            "completely|Totally|neu|The building was ___ destroyed by the fire.",
-            "consequently|As a result|neu|He didn't study; ___, he failed.",
-            "constantly|Continuously|neu|The baby cried ___ throughout the night.",
-            "conversely|In an opposite way|neu|You can add ice; ___, you can heat it.",
-            "currently|At the present time|neu|I am ___ busy with my homework.",
-            "definitely|Without doubt|pos|I will ___ pass the exam this time.",
-            "deliberately|On purpose|neg|He ___ broke the window because he was angry."
+            "abundance|A very large quantity|pos|There is an ___ of food at the buffet.", "abuse|To use improperly or harmfully|neg|Leaders should not ___ their power.",
+            "accommodation|A place to live or stay|neu|The hotel provides excellent ___.", "accompany|To go somewhere with someone|neu|I will ___ you to the hospital.",
+            "account|A record or report|neu|He gave a detailed ___ of the event.", "accuracy|The state of being exact|pos|Check your math for ___.",
+            "accustomed|Familiar with something|neu|I am not ___ to waking up so early.", "acknowledge|To accept or admit truth|pos|You must ___ your mistakes to grow.",
+            "acquire|To get or buy something|pos|The museum will ___ a new painting.", "activity|A thing that a person does|neu|Running is a healthy physical ___.",
+            "addiction|Cannot stop doing harmful things|neg|He sought help for his gambling ___.", "addition|The action of adding|neu|The new gym is a great ___ to the school.",
+            "administration|Management of a business|neu|The hospital ___ changed the rules.", "adolescence|Period between child and adult|neu|Teenagers go through ___.",
+            "adoption|Legally taking another's child|pos|The couple finalized the ___.", "adult|A fully grown person|neu|You are legally an ___ at 18.",
+            "component|A part of a whole|neu|The battery is a key ___ of the phone.", "concept|An abstract idea|neu|Time travel is an interesting ___.",
+            "conclusion|The end result|neu|What is your final ___ on this matter?", "conflict|A serious disagreement|neg|There is a ___ between the two countries.",
+            "consensus|A general agreement|pos|The group finally reached a ___.", "consequence|A result or effect|neg|Failing is the ___ of not studying.",
+            "contribution|A gift or payment|pos|He made a great ___ to science.", "controversy|Public disagreement|neg|The new law caused a lot of ___.",
+            "crisis|A time of great difficulty|neg|The city faced a financial ___.", "debate|A formal discussion|neu|The students had a ___ about school rules.",
+            "accordingly|Therefore|neu|He was sick; ___, he stayed home.", "accurately|Correctly and precisely|pos|Please answer the questions ___.",
+            "actually|As the truth or facts|neu|I thought it was a dog, but it was ___ a wolf.", "additionally|As an extra factor|neu|The phone is cheap; ___, it is very fast.",
+            "alternatively|As another option|neu|We can walk; ___, we can take a bus.", "although|In spite of the fact that|neu|___ it was raining, we played football.",
+            "always|At all times|neu|You must ___ wear a seatbelt in a car.", "apparently|As far as one can see|neu|___, the test has been canceled.",
+            "approximately|Roughly; around|neu|The journey will take ___ two hours.", "automatically|Without human control|neu|The doors open ___ when you approach.",
+            "barely|Only just; almost not|neg|The music was so quiet I could ___ hear it.", "basically|Fundamentally|neu|The two phones are ___ the same.",
+            "briefly|For a short time|neu|Let me explain the rules very ___.", "carefully|With great attention|pos|You must read the instructions ___.",
+            "certainly|Without a doubt|pos|I will ___ help you with your homework.", "clearly|Easy to see|pos|You must speak loudly and ___.",
+            "closely|With careful attention|neu|Watch the magician's hands very ___.", "commonly|Very often|neu|English is ___ spoken around the world.",
+            "completely|Totally|neu|The building was ___ destroyed by the fire.", "consequently|As a result|neu|He didn't study; ___, he failed.",
+            "constantly|Continuously|neu|The baby cried ___ throughout the night.", "conversely|In an opposite way|neu|You can add ice; ___, you can heat it.",
+            "currently|At the present time|neu|I am ___ busy with my homework.", "definitely|Without doubt|pos|I will ___ pass the exam this time.",
+            "deliberately|On purpose|neg|He ___ broke the window because he was angry.", "despite|Without being affected by|neu|___ the rain, we still went hiking.",
+            "directly|With nothing in between|neu|Go ___ to the principal's office.", "easily|Without difficulty|pos|She won the race very ___.",
+            "effectively|Producing desired result|pos|You must manage your time ___.", "entirely|Completely|neu|The fault was ___ mine.",
+            "especially|To a great extent|neu|I love fruits, ___ sweet apples.", "essentially|Basically|neu|Water is ___ required for all life.",
+            "eventually|In the end|neu|Keep trying, and you will succeed ___.", "exactly|In exact terms|neu|Follow the recipe ___ as it is written.",
+            "extremely|To a very great degree|neu|The weather in summer is ___ hot.", "furthermore|In addition|neu|It is cheap; ___, the quality is good.",
+            "generally|In most cases|neu|Cats are ___ afraid of water.", "hardly|Almost not|neg|I was so tired I could ___ keep my eyes open.",
+            "hence|As a consequence|neu|It rained; ___, the ground is wet.", "honestly|In a truthful way|pos|You must answer the questions ___.",
+            "ironically|Contrary to expectations|neg|___, the fire station burned down.", "moreover|As a further matter|neu|The car is fast; ___, it is very safe.",
+            "nevertheless|In spite of that|neu|It was dangerous; ___, he saved the cat.", "unfortunately|It is unlucky that|neg|___, we missed the last train home.",
+            "determination|Firmness of purpose|pos|Her ___ to win was inspiring.", "diverse|Showing variety|pos|Hong Kong has a very ___ culture.",
+            "economic|Relating to trade or money|neu|The country faces an ___ crisis.", "eliminate|To completely remove|pos|We must ___ all errors in the code.",
+            "emphasize|To give special importance|pos|The teacher will ___ the main rules.", "encounter|To face unexpectedly|neg|You might ___ wild animals in the forest.",
+            "endurance|Ability to last through pain|pos|Marathon runners need incredible ___.", "enhance|To improve the quality of|pos|Spices will ___ the flavor of the food.",
+            "enthusiastic|Showing intense enjoyment|pos|The crowd was very ___ at the concert.", "equivalent|Equal in value|neu|One dollar is ___ to a hundred cents.",
+            "evaluate|To judge the value of|neu|The judge will ___ your performance.", "exceed|To go beyond a limit|pos|Her test scores will ___ expectations.",
+            "exclusive|Restricted to a specific group|neu|This is an ___ club for members only.", "expand|To become larger|pos|The business plans to ___ into Asia.",
+            "expertise|Expert skill or knowledge|pos|He has great ___ in computer science.", "extensive|Covering a large area|pos|She has ___ knowledge of history.",
+            "facilitate|To make an action easier|pos|The new software will ___ our work.", "fundamental|Forming a necessary base|pos|Reading is a ___ skill for students.",
+            "generate|To produce or create|pos|Wind turbines ___ electricity naturally.", "gradual|Taking place slowly|neu|There was a ___ increase in temperature.",
+            "guideline|A general rule|neu|Please follow the safety ___ strictly.", "identical|Similar in every detail|neu|The twin sisters look completely ___.",
+            "illustrate|To explain using examples|pos|Let me ___ my point with a story.", "implement|To put into effect|pos|We will ___ the new rules next week.",
+            "imply|To strongly suggest|neu|What does the author ___ in this sentence?", "incentive|A thing that motivates|pos|Bonus pay is a good ___ to work hard.",
+            "incorporate|To take in or include|neu|We will ___ your ideas into the plan.", "indicate|To point out or show|neu|The red light will ___ danger.",
+            "inevitable|Certain to happen|neu|Change is ___ in modern society.", "initiative|An act to resolve a problem|pos|He took the ___ to clean the classroom.",
+            "innovative|Featuring new methods|pos|Apple is known for its ___ products.", "insight|Deep understanding|pos|The book offers great ___ into history."
         ];
 
-        // Parser
-        function parseVocab(rawArray) {
-            return rawArray.map(str => {
-                let parts = str.split('|');
-                return { w: parts[0], m: parts[1], t: parts[2], s: parts[3] };
-            });
-        }
-        const vocab_L1 = parseVocab(RAW_L1);
-        const vocab_L2 = parseVocab(RAW_L2);
+        function parseVocab(rawArray) { return rawArray.map(str => { let parts = str.split('|'); return { w: parts[0], m: parts[1], t: parts[2], s: parts[3] }; }); }
+        const vocab_L1 = parseVocab(RAW_L1); const vocab_L2 = parseVocab(RAW_L2);
         let activeVocab = []; 
 
         // --- SMART DECKS (No Repeats System) ---
-        // Instead of random picking, we deal cards from a shuffled deck!
         let gameDecks = { study: [], g1: [], g2: [], g3: [], g4: [], g5: [] };
+        let gameCounters = { study: 0, g1: 0, g2: 0, g3: 0, g4: 0, g5: 0 };
 
-        function shuffleDeck(vocabArray) {
-            return [...vocabArray].sort(() => Math.random() - 0.5);
-        }
-
+        function shuffleDeck(vocabArray) { return [...vocabArray].sort(() => Math.random() - 0.5); }
         function getNextWord(deckKey) {
-            if (gameDecks[deckKey].length === 0) {
-                // If deck is empty, refill and shuffle it!
+            if (!gameDecks[deckKey] || gameDecks[deckKey].length === 0) {
                 gameDecks[deckKey] = shuffleDeck(activeVocab);
+                gameCounters[deckKey] = 0; // Reset counter when deck refills
             }
-            return gameDecks[deckKey].pop(); // Deal one card out
+            gameCounters[deckKey]++;
+            return gameDecks[deckKey].pop();
+        }
+        function updateProgressUI(deckKey, prefix) {
+            let el = document.getElementById(deckKey + '-progress');
+            if(el) el.innerText = `${prefix} ${gameCounters[deckKey]} of ${activeVocab.length}`;
         }
 
-        // --- GHOST PLAYERS GENERATOR ---
+        // --- GHOST PLAYERS ---
         const ghostNames = ["Jason (5A)", "Kelly (5B)", "Marco (5A)", "Sammy (5C)", "Tina (5B)", "Alex (5A)", "Rachel (5C)"];
         let rivalPlayers = [];
         function generateGhosts() {
-            let ghosts = [];
-            let now = Date.now();
-            let oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
+            let ghosts = []; let now = Date.now(); let oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
             ghostNames.forEach(name => {
-                let xpLog = [];
-                let totalTargetXP = Math.floor(Math.random() * 3500) + 500; 
-                let currentXP = 0;
+                let xpLog = []; let totalTargetXP = Math.floor(Math.random() * 3500) + 500; let currentXP = 0;
                 while(currentXP < totalTargetXP) {
                     let points = (Math.random() > 0.8) ? 200 : 100;
-                    xpLog.push({ xp: points, ts: oneWeekAgo + Math.random() * (now - oneWeekAgo) });
-                    currentXP += points;
+                    xpLog.push({ xp: points, ts: oneWeekAgo + Math.random() * (now - oneWeekAgo) }); currentXP += points;
                 }
                 let avatars = ["🦁", "🦊", "🐺", "🦉", "🐼", "🐯", "🐨"];
                 ghosts.push({ name: name, avatar: avatars[Math.floor(Math.random() * avatars.length)], xpLog: xpLog });
@@ -477,18 +438,15 @@
         }
 
         // --- GLOBAL AUTH & STATE ---
-        const DB_KEY = "dseArcadeDB_v14"; 
-        const CURRENT_USER_KEY = "dseArcadeUser_v14";
+        const DB_KEY = "dseArcadeDB_v15"; const CURRENT_USER_KEY = "dseArcadeUser_v15";
         let usersDB = {}; let currentUser = null; let currentStreak = 0; let isWaiting = false; let activeTab = 'study'; let tempAvatar = "🐉";
 
         function initApp() {
-            let savedGhosts = localStorage.getItem("dseArcadeGhosts_v14");
+            let savedGhosts = localStorage.getItem("dseArcadeGhosts_v15");
             if (savedGhosts) { rivalPlayers = JSON.parse(savedGhosts); } 
-            else { rivalPlayers = generateGhosts(); localStorage.setItem("dseArcadeGhosts_v14", JSON.stringify(rivalPlayers)); }
+            else { rivalPlayers = generateGhosts(); localStorage.setItem("dseArcadeGhosts_v15", JSON.stringify(rivalPlayers)); }
 
-            let db = localStorage.getItem(DB_KEY);
-            if (db) usersDB = JSON.parse(db);
-            
+            let db = localStorage.getItem(DB_KEY); if (db) usersDB = JSON.parse(db);
             let loggedInUser = localStorage.getItem(CURRENT_USER_KEY);
             if (loggedInUser && usersDB[loggedInUser]) {
                 currentUser = loggedInUser;
@@ -497,7 +455,6 @@
             }
         }
 
-        // --- AUTHENTICATION ---
         function switchAuthMode(mode) {
             document.getElementById("auth-error").innerText = "";
             if(mode === 'login') {
@@ -515,9 +472,8 @@
         function processRegister() {
             let user = document.getElementById("reg-username").value.trim();
             let pass = document.getElementById("reg-password").value.trim();
-            let err = document.getElementById("auth-error");
-            if(user === "" || pass === "") { err.innerText = "Please fill in all fields."; return; }
-            if(usersDB[user]) { err.innerText = "Username exists. Please login."; return; }
+            if(user === "" || pass === "") { document.getElementById("auth-error").innerText = "Please fill in all fields."; return; }
+            if(usersDB[user]) { document.getElementById("auth-error").innerText = "Username exists. Please login."; return; }
             
             usersDB[user] = { password: pass, avatar: tempAvatar, xpLog: [], mistakes: [] };
             localStorage.setItem(DB_KEY, JSON.stringify(usersDB));
@@ -527,10 +483,8 @@
         function processLogin() {
             let user = document.getElementById("login-username").value.trim();
             let pass = document.getElementById("login-password").value.trim();
-            let err = document.getElementById("auth-error");
-            if(user === "" || pass === "") { err.innerText = "Please enter username and password."; return; }
-            if(!usersDB[user]) { err.innerText = "Username not found. Please register."; return; }
-            if(usersDB[user].password !== pass) { err.innerText = "Incorrect password."; return; }
+            if(user === "" || pass === "") { document.getElementById("auth-error").innerText = "Please enter credentials."; return; }
+            if(!usersDB[user] || usersDB[user].password !== pass) { document.getElementById("auth-error").innerText = "Invalid login."; return; }
             
             if(!usersDB[user].xpLog) usersDB[user].xpLog = []; if(!usersDB[user].mistakes) usersDB[user].mistakes = []; 
             currentUser = user; localStorage.setItem(CURRENT_USER_KEY, currentUser);
@@ -540,34 +494,28 @@
             currentUser = null; localStorage.removeItem(CURRENT_USER_KEY);
             document.getElementById("login-username").value = ""; document.getElementById("login-password").value = "";
             document.getElementById("reg-username").value = ""; document.getElementById("reg-password").value = "";
-            document.getElementById("auth-error").innerText = ""; 
-            document.getElementById("main-container").classList.remove("active");
+            document.getElementById("auth-error").innerText = ""; document.getElementById("main-container").classList.remove("active");
             document.getElementById("auth-modal").style.display = "flex";
         }
         function saveData() { if(currentUser) localStorage.setItem(DB_KEY, JSON.stringify(usersDB)); }
 
-        // --- LEVEL SELECTION & SMART DECK INIT ---
+        // --- LEVEL SELECTION ---
         function selectLevel(level) {
             activeVocab = (level === 1) ? vocab_L1 : vocab_L2;
-            
-            // Empty all decks so they automatically refill and shuffle with the new level
             gameDecks = { study: [], g1: [], g2: [], g3: [], g4: [], g5: [] };
+            gameCounters = { study: 0, g1: 0, g2: 0, g3: 0, g4: 0, g5: 0 };
             
             document.getElementById("level-modal").style.display = "none";
             document.getElementById("main-container").classList.add("active");
-            
             document.getElementById("level-display").innerText = (level === 1) ? "Level 1: Core DSE" : "Level 2: Advanced";
             
-            updateDashboard();
-            switchTab('study'); // Load Flashcards!
+            updateDashboard(); switchTab('study'); 
         }
 
         // --- DASHBOARD & XP ---
         function updateDashboard() {
             if(!currentUser) return;
-            let profile = usersDB[currentUser];
-            let totalXP = profile.xpLog.reduce((sum, log) => sum + log.xp, 0);
-            
+            let profile = usersDB[currentUser]; let totalXP = profile.xpLog.reduce((sum, log) => sum + log.xp, 0);
             document.getElementById("display-name").innerText = currentUser;
             document.getElementById("display-avatar").innerText = profile.avatar;
             document.getElementById("xp-display").innerText = totalXP;
@@ -577,8 +525,7 @@
             if (currentStreak >= 3) { streakEl.classList.add("on-fire"); comboMsg.innerText = "🔥 FIRE MODE: x2 POINTS ACTIVE! 🔥"; } 
             else { streakEl.classList.remove("on-fire"); comboMsg.innerText = ""; }
 
-            let rank = "Bronze";
-            if (totalXP > 1000) rank = "Silver"; if (totalXP > 2500) rank = "Gold"; if (totalXP > 4000) rank = "Diamond";
+            let rank = "Bronze"; if (totalXP > 1000) rank = "Silver"; if (totalXP > 2500) rank = "Gold"; if (totalXP > 4000) rank = "Diamond";
             document.getElementById("rank-display").innerText = `Rank: ${rank}`;
             renderLeaderboard('weekly'); 
         }
@@ -587,12 +534,10 @@
             if(!currentUser) return;
             const now = Date.now();
             if (isCorrect) {
-                currentStreak++;
-                let points = (currentStreak >= 3) ? 200 : 100;
+                currentStreak++; let points = (currentStreak >= 3) ? 200 : 100;
                 usersDB[currentUser].xpLog.push({ xp: points, ts: now });
             } else {
-                currentStreak = 0;
-                usersDB[currentUser].xpLog.push({ xp: -50, ts: now });
+                currentStreak = 0; usersDB[currentUser].xpLog.push({ xp: -50, ts: now });
                 document.getElementById(boardId).classList.add("shake");
                 setTimeout(() => document.getElementById(boardId).classList.remove("shake"), 400);
                 if (targetWordStr && !usersDB[currentUser].mistakes.includes(targetWordStr)) {
@@ -603,63 +548,42 @@
         }
 
         function switchTab(tabId) {
-            if(isWaiting) return;
-            activeTab = tabId;
+            if(isWaiting) return; activeTab = tabId;
             document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.content-board').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
             document.getElementById(`${tabId}-board`).classList.add('active');
             
-            if(tabId === 'study') nextCard(); // Load first card
-            if(tabId === 'game-1') loadG1();
-            if(tabId === 'game-2') loadG2();
-            if(tabId === 'game-3') loadG3();
-            if(tabId === 'game-4') loadG4();
-            if(tabId === 'game-5') loadG5();
-            if(tabId === 'corrections') renderCorrections();
-            if(tabId === 'leaderboard') renderLeaderboard('weekly');
+            if(tabId === 'study') nextCard(); 
+            if(tabId === 'game-1') loadG1(); if(tabId === 'game-2') loadG2(); if(tabId === 'game-3') loadG3();
+            if(tabId === 'game-4') loadG4(); if(tabId === 'game-5') loadG5();
+            if(tabId === 'corrections') renderCorrections(); if(tabId === 'leaderboard') renderLeaderboard('weekly');
         }
 
-        // --- 📚 FLASHCARD LOGIC ---
+        // --- FLASHCARDS ---
         const flashcardEl = document.getElementById('flashcard');
-        let currentFCCard = null;
         function flipCard() { flashcardEl.classList.toggle('is-flipped'); }
         function nextCard() { 
-            // Unflip if it was flipped
-            if(flashcardEl.classList.contains('is-flipped')) {
-                flashcardEl.classList.remove('is-flipped');
-                setTimeout(() => { showNextCardContent(); }, 250); // wait for flip animation to hide text
-            } else {
-                showNextCardContent();
-            }
+            if(flashcardEl.classList.contains('is-flipped')) { flashcardEl.classList.remove('is-flipped'); setTimeout(() => { showNextCardContent(); }, 250); } 
+            else { showNextCardContent(); }
         }
+        function prevCard() { nextCard(); } /* Prev is functionally next in a deck system */
         function showNextCardContent() {
-            currentFCCard = getNextWord('study'); // Get guaranteed new word
+            let currentFCCard = getNextWord('study');
             document.getElementById('word-front').innerText = currentFCCard.w;
             document.getElementById('word-back').innerText = "📖 " + currentFCCard.m;
-            document.getElementById('word-sentence').innerText = `"${currentFCCard.s.replace("___", `[ ${currentFCCard.w.toUpperCase()} ]`)}"`;
-            // Calculate progress in current deck cycle
-            let deckSize = activeVocab.length;
-            let currentNum = deckSize - gameDecks['study'].length;
-            document.getElementById('card-counter').innerText = `Card ${currentNum} of ${deckSize} in this cycle`;
-        }
-
-        // --- UTILS FOR GAMES ---
-        function getWrongOptions(correctWord, amount) {
-            let opts = new Set([correctWord]);
-            while(opts.size < amount) {
-                opts.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w);
-            }
-            return Array.from(opts).sort(() => Math.random() - 0.5);
+            document.getElementById('word-sentence').innerText = `"${currentFCCard.s.replace("___", `[ ${currentFCCard.w} ]`)}"`;
+            updateProgressUI('study', 'Card');
         }
 
         // --- GAME 1: Meaning ---
         let g1Target, g1Options;
         function loadG1() {
             isWaiting = false;
-            let correctObj = getNextWord('g1');
-            g1Target = correctObj.w; document.getElementById("g1-prompt").innerText = `"${correctObj.m}"`;
-            g1Options = getWrongOptions(g1Target, 4);
+            let correctObj = getNextWord('g1'); g1Target = correctObj.w; document.getElementById("g1-prompt").innerText = `"${correctObj.m}"`;
+            updateProgressUI('g1', 'Q');
+            let opts = new Set([g1Target]); while(opts.size < 4) { opts.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w); }
+            g1Options = Array.from(opts).sort(() => Math.random() - 0.5);
             for(let i=0; i<4; i++) { let btn = document.getElementById(`g1-opt-${i}`); btn.innerText = g1Options[i]; btn.className = "option-btn"; }
         }
         function checkG1(index) {
@@ -675,9 +599,8 @@
         function loadG2() {
             isWaiting = false;
             ['pos', 'neu', 'neg'].forEach(v => document.querySelector(`.vibe-btn-${v}`).className = `option-btn vibe-btn-${v}`);
-            let correctObj = getNextWord('g2');
-            g2TargetWord = correctObj.w; g2TargetSentiment = correctObj.t;
-            document.getElementById("g2-prompt").innerText = g2TargetWord.toUpperCase();
+            let correctObj = getNextWord('g2'); g2TargetWord = correctObj.w; g2TargetSentiment = correctObj.t;
+            document.getElementById("g2-prompt").innerText = g2TargetWord; updateProgressUI('g2', 'Q');
         }
         function checkG2(chosenSentiment) {
             if(isWaiting) return; isWaiting = true;
@@ -691,15 +614,16 @@
         let g3Target, g3Options, g3Sentence;
         function loadG3() {
             isWaiting = false;
-            let correctObj = getNextWord('g3');
-            g3Target = correctObj.w; g3Sentence = correctObj.s; document.getElementById("g3-prompt").innerText = g3Sentence;
-            g3Options = getWrongOptions(g3Target, 4);
+            let correctObj = getNextWord('g3'); g3Target = correctObj.w; g3Sentence = correctObj.s; document.getElementById("g3-prompt").innerText = g3Sentence;
+            updateProgressUI('g3', 'Q');
+            let opts = new Set([g3Target]); while(opts.size < 4) { opts.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w); }
+            g3Options = Array.from(opts).sort(() => Math.random() - 0.5);
             for(let i=0; i<4; i++) { let btn = document.getElementById(`g3-opt-${i}`); btn.innerText = g3Options[i]; btn.className = "option-btn"; }
         }
         function checkG3(index) {
             if(isWaiting) return; isWaiting = true;
             let btn = document.getElementById(`g3-opt-${index}`); let isCorrect = (g3Options[index] === g3Target);
-            if(isCorrect) { btn.classList.add("correct-btn"); document.getElementById("g3-prompt").innerHTML = g3Sentence.replace("___", `<span style="color: #10b981;">[${g3Target.toUpperCase()}]</span>`); } 
+            if(isCorrect) { btn.classList.add("correct-btn"); document.getElementById("g3-prompt").innerHTML = g3Sentence.replace("___", `<span style="color: #10b981; font-weight:bold;">[${g3Target}]</span>`); } 
             else { btn.classList.add("wrong-btn"); document.getElementById(`g3-opt-${g3Options.indexOf(g3Target)}`).classList.add("correct-btn"); }
             handleAnswerResult(isCorrect, "game-3-board", g3Target); setTimeout(loadG3, 1500);
         }
@@ -708,10 +632,11 @@
         let g4Target, g4Options, g4Sentence;
         function loadG4() {
             isWaiting = false;
-            let correctObj = getNextWord('g4');
-            g4Target = correctObj.w; g4Sentence = correctObj.s; document.getElementById("g4-prompt").innerText = g4Sentence.replace("___", "______");
+            let correctObj = getNextWord('g4'); g4Target = correctObj.w; g4Sentence = correctObj.s; document.getElementById("g4-prompt").innerText = g4Sentence.replace("___", "______");
+            updateProgressUI('g4', 'Q');
             let playBtn = document.getElementById("play-audio-btn"); playBtn.style.background = "#a855f7"; playBtn.innerText = "▶️ PLAY AUDIO";
-            g4Options = getWrongOptions(g4Target, 4);
+            let opts = new Set([g4Target]); while(opts.size < 4) { opts.add(activeVocab[Math.floor(Math.random() * activeVocab.length)].w); }
+            g4Options = Array.from(opts).sort(() => Math.random() - 0.5);
             for(let i=0; i<4; i++) { let btn = document.getElementById(`g4-opt-${i}`); btn.innerText = g4Options[i]; btn.className = "option-btn"; }
         }
         function playAudio() {
@@ -726,7 +651,7 @@
         function checkG4(index) {
             if(isWaiting) return; isWaiting = true; window.speechSynthesis.cancel();
             let btn = document.getElementById(`g4-opt-${index}`); let isCorrect = (g4Options[index] === g4Target);
-            if(isCorrect) { btn.classList.add("correct-btn"); document.getElementById("g4-prompt").innerHTML = g4Sentence.replace("___", `<span style="color: #10b981;">[${g4Target.toUpperCase()}]</span>`); } 
+            if(isCorrect) { btn.classList.add("correct-btn"); document.getElementById("g4-prompt").innerHTML = g4Sentence.replace("___", `<span style="color: #10b981; font-weight:bold;">[${g4Target}]</span>`); } 
             else { btn.classList.add("wrong-btn"); document.getElementById(`g4-opt-${g4Options.indexOf(g4Target)}`).classList.add("correct-btn"); }
             handleAnswerResult(isCorrect, "game-4-board", g4Target); setTimeout(loadG4, 1500);
         }
@@ -735,11 +660,9 @@
         let g5Original = [], g5Scrambled = [], g5Current = [], g5TargetWord = "";
         function loadG5() {
             isWaiting = false; document.getElementById("g5-answer-box").className = "answer-slot"; 
-            let correctObj = getNextWord('g5');
-            g5TargetWord = correctObj.w;
-            let fullSentence = correctObj.s.replace("___", correctObj.w);
-            g5Original = fullSentence.split(" "); g5Scrambled = [...g5Original].sort(() => Math.random() - 0.5); g5Current = [];
-            renderG5();
+            let correctObj = getNextWord('g5'); g5TargetWord = correctObj.w; updateProgressUI('g5', 'Q');
+            g5Original = correctObj.s.replace("___", correctObj.w).split(" ");
+            g5Scrambled = [...g5Original].sort(() => Math.random() - 0.5); g5Current = []; renderG5();
         }
         function renderG5() {
             let bankHtml = ""; g5Scrambled.forEach((word, index) => { bankHtml += `<button class="scramble-btn" onclick="selectWordG5(${index})">${word}</button>`; });
@@ -770,7 +693,7 @@
             userMistakes.forEach(wordStr => {
                 let wordData = combinedVocab.find(v => v.w === wordStr);
                 if (wordData) {
-                    let fullSentence = wordData.s.replace("___", `[ ${wordData.w.toUpperCase()} ]`);
+                    let fullSentence = wordData.s.replace("___", `[ ${wordData.w} ]`);
                     html += `<div class="mistake-card"><div class="mistake-word">${wordData.w}</div><div class="mistake-mean">📖 ${wordData.m}</div><div class="mistake-sent">💬 "${fullSentence}"</div></div>`;
                 }
             });
@@ -812,4 +735,5 @@
     </script>
 </body>
 </html>
+
 
